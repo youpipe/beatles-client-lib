@@ -2,6 +2,8 @@ package config
 
 import (
 	"encoding/json"
+	"github.com/giantliao/beatles-protocol/miners"
+	"github.com/kprc/libeth/account"
 	"github.com/kprc/nbsnetwork/tools"
 	"log"
 	"os"
@@ -15,18 +17,26 @@ const (
 )
 
 type BtlClientConf struct {
-	EthAccessPoint string `json:"eth_access_point"`
-	TrxAccessPoint string `json:"trx_access_point"`
+	BeatlesMasterAddr account.BeatleAddress `json:"beatles_master_addr"`
+	BeatlesEthAddr    string                `json:"beatles_eth_addr"`
+	BeatlesTrxAddr    string                `json:"beatles_trx_addr"`
+	EthAccPoint       string                `json:"eth_acc_point"`
+	TrxAccPoint       string                `json:"trx_acc_point"`
 
-	CmdListenPort  string `json:"cmdlistenport"`
-	HttpServerPort int    `json:"http_server_port"`
-	WalletSavePath string `json:"wallet_save_path"`
+	CmdListenPort   string `json:"cmdlistenport"`
+	HttpServerPort  int    `json:"http_server_port"`
+	WalletSavePath  string `json:"wallet_save_path"`
+	LicenseSavePath string `json:"license_save_path"`
 
 	ApiPath       string  `json:"api_path"`
 	PurchasePath  string  `json:"purchase_path"`
 	ListMinerPath string  `json:"list_miner_path"`
 	EthBalance    float64 `json:"-"`
 	TrxBalance    float64 `json:"-"`
+
+	GithubAddress []*miners.GithubDownLoadPoint
+
+	Miners []*miners.Miner
 }
 
 var (
@@ -38,10 +48,19 @@ func (bc *BtlClientConf) InitCfg() *BtlClientConf {
 	bc.HttpServerPort = 50102
 	bc.CmdListenPort = "127.0.0.1:50502"
 	bc.WalletSavePath = "wallet.json"
+	bc.LicenseSavePath = "license.json"
 
 	bc.ApiPath = "api"
 	bc.PurchasePath = "purchase"
 	bc.ListMinerPath = "list"
+
+	gd := &miners.GithubDownLoadPoint{}
+	gd.Path = "beatles.bootstrap"
+	gd.Repository = "beatleslist"
+	gd.Owner = "youpipe001"
+	gd.ReadToken = "8f92e1c369f2fd216d5bf4b6285401581735c702"
+
+	bc.GithubAddress = append(bc.GithubAddress, gd)
 
 	return bc
 }
