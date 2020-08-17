@@ -2,7 +2,7 @@
 a vpn client lib of beatles 
 
 //todo list
-1. bootstrap msg from github
+1. bootstrap msg from github  [ok]
 2. support paclist
 3. client -> miner stream
 4. client setting [mac,win,linux]

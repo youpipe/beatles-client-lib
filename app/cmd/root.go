@@ -17,6 +17,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/giantliao/beatles-client-lib/bootstrap"
 	"github.com/howeyc/gopass"
 	"os"
 
@@ -81,8 +82,16 @@ var rootCmd = &cobra.Command{
 		//	return
 		//}
 
-		if keypassword == "" {
-			if keypassword, err = inputpassword(); err != nil {
+		//if keypassword == "" {
+		//	if keypassword, err = inputpassword(); err != nil {
+		//		log.Println(err)
+		//		return
+		//	}
+		//}
+
+		if len(cfg.Miners) == 0{
+			err:=bootstrap.UpdateBootstrap()
+			if err!=nil{
 				log.Println(err)
 				return
 			}
@@ -143,9 +152,9 @@ func InitCfg() {
 
 func cfginit(bc *config.BtlClientConf) *config.BtlClientConf {
 	cfg := bc
-	if remoteethaccesspoint != "" {
-		cfg.EthAccessPoint = remoteethaccesspoint
-	}
+	//if remoteethaccesspoint != "" {
+	//	cfg.EthAccessPoint = remoteethaccesspoint
+	//}
 	//if cmdroottcpport > 0 && cmdroottcpport < 65535 {
 	//	cfg.TcpPort = cmdroottcpport
 	//}
