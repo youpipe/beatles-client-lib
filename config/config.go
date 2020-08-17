@@ -17,25 +17,25 @@ const (
 )
 
 type BtlClientConf struct {
-	BeatlesMasterAddr account.BeatleAddress 		`json:"beatles_master_addr"`
-	BeatlesEthAddr    string                		`json:"beatles_eth_addr"`
-	BeatlesTrxAddr    string                		`json:"beatles_trx_addr"`
-	EthAccPoint       string                		`json:"eth_acc_point"`
-	TrxAccPoint       string                		`json:"trx_acc_point"`
+	BeatlesMasterAddr account.BeatleAddress `json:"beatles_master_addr"`
+	BeatlesEthAddr    string                `json:"beatles_eth_addr"`
+	BeatlesTrxAddr    string                `json:"beatles_trx_addr"`
+	EthAccPoint       string                `json:"eth_acc_point"`
+	TrxAccPoint       string                `json:"trx_acc_point"`
 
-	CmdListenPort   string 							`json:"cmdlistenport"`
-	HttpServerPort  int    							`json:"http_server_port"`
-	WalletSavePath  string 							`json:"wallet_save_path"`
-	LicenseSavePath string 							`json:"license_save_path"`
+	CmdListenPort   string `json:"cmdlistenport"`
+	HttpServerPort  int    `json:"http_server_port"`
+	WalletSavePath  string `json:"wallet_save_path"`
+	LicenseSavePath string `json:"license_save_path"`
 
-	ApiPath       string  							`json:"api_path"`
-	PurchasePath  string  							`json:"purchase_path"`
-	ListMinerPath string  							`json:"list_miner_path"`
-	EthBalance    float64 							`json:"-"`
-	TrxBalance    float64 							`json:"-"`
+	ApiPath       string  `json:"api_path"`
+	PurchasePath  string  `json:"purchase_path"`
+	ListMinerPath string  `json:"list_miner_path"`
+	EthBalance    float64 `json:"-"`
+	TrxBalance    float64 `json:"-"`
 
-	GithubAddress []*miners.GithubDownLoadPoint		`json:"github_address"`
-	Miners []*miners.Miner							`json:"miners"`
+	GithubAddress []*miners.GithubDownLoadPoint `json:"github_address"`
+	Miners        []*miners.Miner               `json:"miners"`
 }
 
 var (

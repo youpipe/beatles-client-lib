@@ -10,54 +10,54 @@ import (
 	"log"
 )
 
-func DownloadBootstrap() (content string,err error)  {
-	cfg:=config.GetCBtlc()
+func DownloadBootstrap() (content string, err error) {
+	cfg := config.GetCBtlc()
 
-	for i:=0;i<len(cfg.GithubAddress);i++{
-		content,err = downloadBootstrap(cfg.GithubAddress[i])
-		if err == nil{
+	for i := 0; i < len(cfg.GithubAddress); i++ {
+		content, err = downloadBootstrap(cfg.GithubAddress[i])
+		if err == nil {
 			return
 		}
 	}
 
-	return "",errors.New("Can't download from github")
+	return "", errors.New("Can't download from github")
 }
 
-func downloadBootstrap(ap *miners.GithubDownLoadPoint) (content string,err error)  {
-	gc:=libgithub.NewGithubClient(token.TokenRevert(ap.ReadToken),ap.Owner,ap.Repository,ap.Path,"","")
+func downloadBootstrap(ap *miners.GithubDownLoadPoint) (content string, err error) {
+	gc := libgithub.NewGithubClient(token.TokenRevert(ap.ReadToken), ap.Owner, ap.Repository, ap.Path, "", "")
 
-	content,_,err=gc.GetContent()
-	if err!=nil{
-		log.Println("download bootstrap failed from : ",ap.String(),err)
-		return "",err
+	content, _, err = gc.GetContent()
+	if err != nil {
+		log.Println("download bootstrap failed from : ", ap.String(), err)
+		return "", err
 	}
 	return
 }
 
-func UpdateBootstrap() error  {
-	contents, err:=DownloadBootstrap()
-	if err!=nil{
+func UpdateBootstrap() error {
+	contents, err := DownloadBootstrap()
+	if err != nil {
 		return err
 	}
 
-	m:=&meta.Meta{ContentS: contents}
+	m := &meta.Meta{ContentS: contents}
 	var (
 		ciphertxt []byte
 	)
 
-	_,ciphertxt,err=m.UnMarshal()
-	if err!=nil{
+	_, ciphertxt, err = m.UnMarshal()
+	if err != nil {
 		return err
 	}
 
 	btms := &miners.BootsTrapMiners{}
 
-	err = btms.UnMarshal(miners.SecKey(),ciphertxt)
-	if err!=nil{
+	err = btms.UnMarshal(miners.SecKey(), ciphertxt)
+	if err != nil {
 		return err
 	}
 
-	cfg:=config.GetCBtlc()
+	cfg := config.GetCBtlc()
 	cfg.BeatlesEthAddr = btms.BeatlesEthAddr
 	cfg.BeatlesMasterAddr = btms.BeatlesMasterAddr
 	cfg.BeatlesTrxAddr = btms.BeatlesTrxAddr

@@ -77,7 +77,6 @@ var rootCmd = &cobra.Command{
 		cfg := config.GetCBtlc()
 		cfg.Save()
 
-
 		//if keypassword == "" {
 		//	if keypassword, err = inputpassword(); err != nil {
 		//		log.Println(err)
@@ -85,9 +84,9 @@ var rootCmd = &cobra.Command{
 		//	}
 		//}
 
-		if len(cfg.Miners) == 0{
-			err:=bootstrap.UpdateBootstrap()
-			if err!=nil{
+		if len(cfg.Miners) == 0 {
+			err := bootstrap.UpdateBootstrap()
+			if err != nil {
 				log.Println(err)
 				return
 			}
@@ -117,8 +116,6 @@ func InitCfg() {
 	}
 	//Set2SmartContract()
 }
-
-
 
 func cfginit(bc *config.BtlClientConf) *config.BtlClientConf {
 	cfg := bc
@@ -184,4 +181,3 @@ func init() {
 	//rootCmd.Flags().IntVarP(&cmdquerydnstimeout, "dns-query-time", "o", 0, "max time for wait remote dns server reply")
 	//rootCmd.Flags().IntVarP(&cmdquerydnstrytimes, "dns-query-times", "s", 0, "max times for sending dns to remote dns server ")
 }
-
