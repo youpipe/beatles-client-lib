@@ -76,11 +76,7 @@ var rootCmd = &cobra.Command{
 		InitCfg()
 		cfg := config.GetCBtlc()
 		cfg.Save()
-		//
-		//if !chatcrypt.KeyIsGenerated() {
-		//	log.Println("please create account first")
-		//	return
-		//}
+
 
 		//if keypassword == "" {
 		//	if keypassword, err = inputpassword(); err != nil {
@@ -97,14 +93,6 @@ var rootCmd = &cobra.Command{
 			}
 		}
 
-		//chatcrypt.LoadKey(keypassword)
-
-		//if config.IsUserIdentifyReceived() {
-		//	config.LoadUserIdentify()
-		//}
-
-		//go httpservice.StartWebDaemon()
-		//msgdrive.RegMsgDriveFunc(chatmeta.FetchGroupKey2)
 		cmdservice.GetCmdServerInst().StartCmdService()
 	},
 }
@@ -130,25 +118,7 @@ func InitCfg() {
 	//Set2SmartContract()
 }
 
-//
-//func Set2SmartContract() {
-//	cfg := config.GetBasDisCfg()
-//
-//	//fmt.Println(*cfg)
-//
-//	//if cfg.RopstenNAP != "" {
-//	//	BAS_Ethereum.RopstenNetworkAccessPoint = cfg.RopstenNAP
-//	//}
-//	//
-//	//if cfg.TokenAddr != "" {
-//	//	BAS_Ethereum.BASTokenAddress = cfg.TokenAddr
-//	//}
-//	//
-//	//if cfg.MgrAddr != "" {
-//	//	BAS_Ethereum.BASManagerSimpleAddress = cfg.MgrAddr
-//	//}
-//
-//}
+
 
 func cfginit(bc *config.BtlClientConf) *config.BtlClientConf {
 	cfg := bc
@@ -215,29 +185,3 @@ func init() {
 	//rootCmd.Flags().IntVarP(&cmdquerydnstrytimes, "dns-query-times", "s", 0, "max times for sending dns to remote dns server ")
 }
 
-//
-//// initConfig reads in config file and ENV variables if set.
-//func initConfig() {
-//	if cfgFile != "" {
-//		// Use config file from the flag.
-//		viper.SetConfigFile(cfgFile)
-//	} else {
-//		// Find home directory.
-//		home, err := homedir.Dir()
-//		if err != nil {
-//			fmt.Println(err)
-//			os.Exit(1)
-//		}
-//
-//		// Search config in home directory with name ".app" (without extension).
-//		viper.AddConfigPath(home)
-//		viper.SetConfigName(".app")
-//	}
-//
-//	viper.AutomaticEnv() // read in environment variables that match
-//
-//	// If a config file is found, read it in.
-//	if err := viper.ReadInConfig(); err == nil {
-//		fmt.Println("Using config file:", viper.ConfigFileUsed())
-//	}
-//}
