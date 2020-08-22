@@ -75,14 +75,6 @@ var rootCmd = &cobra.Command{
 
 		InitCfg()
 		cfg := config.GetCBtlc()
-		cfg.Save()
-
-		//if keypassword == "" {
-		//	if keypassword, err = inputpassword(); err != nil {
-		//		log.Println(err)
-		//		return
-		//	}
-		//}
 
 		if len(cfg.Miners) == 0 {
 			err := bootstrap.UpdateBootstrap()
@@ -91,6 +83,7 @@ var rootCmd = &cobra.Command{
 				return
 			}
 		}
+		cfg.Save()
 
 		cmdservice.GetCmdServerInst().StartCmdService()
 	},
