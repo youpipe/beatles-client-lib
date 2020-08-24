@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/giantliao/beatles-client-lib/bootstrap"
+	"github.com/giantliao/beatles-client-lib/clientwallet"
 	"github.com/howeyc/gopass"
 	"os"
 
@@ -75,6 +76,16 @@ var rootCmd = &cobra.Command{
 
 		InitCfg()
 		cfg := config.GetCBtlc()
+		keypassword, err = inputpassword()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		err = clientwallet.LoadWallet(keypassword)
+		if err != nil {
+			log.Println(err)
+			return
+		}
 
 		if len(cfg.Miners) == 0 {
 			err := bootstrap.UpdateBootstrap()

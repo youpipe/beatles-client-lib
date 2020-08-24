@@ -2,9 +2,14 @@ package api
 
 import (
 	"context"
-
+	"encoding/json"
 	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
 	"github.com/giantliao/beatles-client-lib/app/cmdpb"
+	"github.com/giantliao/beatles-client-lib/bootstrap"
+	"github.com/giantliao/beatles-client-lib/clientwallet"
+	"github.com/giantliao/beatles-client-lib/config"
+	"github.com/giantliao/beatles-client-lib/licenses"
+	"strconv"
 
 	"time"
 )
@@ -15,135 +20,10 @@ type CmdStringOPSrv struct {
 func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (*cmdpb.DefaultResp, error) {
 	msg := ""
 	switch so.Op {
-	case cmdcommon.CMD_ACCOUNT_CREATE:
-		//msg = createAccount(so.Param[0])
-	case cmdcommon.CMD_ACCOUNT_LOAD:
-		//msg = loadAccount(so.Param[0])
-	//case cmdcommon.CMD_REG_USER:
-	//	if len(so.Param) != 2 {
-	//		msg = "Param error"
-	//	} else {
-	//		msg = regUser(so.Param[0], so.Param[1])
-	//	}
-	//case cmdcommon.CMD_ADD_FRIEND:
-	//	if len(so.Param) != 1 {
-	//		msg = "Param error"
-	//	} else {
-	//		msg = addFriend(so.Param[0])
-	//	}
-	//case cmdcommon.CMD_DEL_FRIEND:
-	//	if len(so.Param) != 1 {
-	//		msg = "Param error"
-	//	} else {
-	//		msg = delFriend(so.Param[0])
-	//	}
-	//
-	//case cmdcommon.CMD_CREATE_GROUP:
-	//	if len(so.Param) != 1 {
-	//		msg = "Param error"
-	//	} else {
-	//		msg = createGroup(so.Param[0])
-	//	}
-	//case cmdcommon.CMD_DEL_GROUP:
-	//	if len(so.Param) != 1 {
-	//		msg = "Param error"
-	//	} else {
-	//		msg = delGroup(so.Param[0])
-	//	}
-	//
-	//case cmdcommon.CMD_JOIN_GROUP:
-	//	if len(so.Param) != 2 {
-	//		msg = "Param error"
-	//	} else {
-	//		msg = joinGroup(so.Param[0], so.Param[1])
-	//	}
-	//case cmdcommon.CMD_QUIT_GROUP:
-	//	if len(so.Param) != 2 {
-	//		msg = "Param error"
-	//	} else {
-	//		msg = quitGroup(so.Param[0], so.Param[1])
-	//	}
-	//case cmdcommon.CMD_LIST_GROUPMBRS:
-	//	if len(so.Param) != 1 {
-	//		msg = "Param error"
-	//	} else {
-	//
-	//		msg = cso.ListGroupMembers(so.Param[0])
-	//
-	//		if msg == "" {
-	//			msg = "no results"
-	//		}
-	//	}
-	//case cmdcommon.CMD_LISTEN_FRIEND:
-	//	if len(so.Param) != 2 {
-	//		msg = "Param error"
-	//	} else {
-	//		if !address.ChatAddress(so.Param[0]).IsValid() {
-	//			msg = "not a friend address"
-	//		} else {
-	//			msg = chatmessage.Listen(address.ChatAddress(so.Param[0]), so.Param[1])
-	//		}
-	//	}
-	//case cmdcommon.CMD_QUIT_LISTEN_FRIEND:
-	//	if len(so.Param) != 1 {
-	//		msg = "Param error"
-	//	} else {
-	//		if !address.ChatAddress(so.Param[0]).IsValid() {
-	//			msg = "not a friend address"
-	//		} else {
-	//			msg = chatmessage.StopListen(address.ChatAddress(so.Param[0]))
-	//		}
-	//	}
-	//case cmdcommon.CMD_SEND_P2PMSG:
-	//	if len(so.Param) != 2 {
-	//		msg = "param error"
-	//	} else {
-	//		if !address.ChatAddress(so.Param[1]).IsValid() {
-	//			msg = "not a friend address"
-	//		} else {
-	//			err := chatmessage.SendP2pMsg(address.ChatAddress(so.Param[1]), so.Param[0])
-	//			if err != nil {
-	//				msg = err.Error()
-	//			} else {
-	//				msg = "Send Message successful"
-	//			}
-	//		}
-	//	}
-	//case cmdcommon.CMD_SEND_GMSG:
-	//	if len(so.Param) != 2 {
-	//		msg = "Param error"
-	//	} else {
-	//		if !groupid.GrpID(so.Param[1]).IsValid() {
-	//			msg = "not a valid group id"
-	//		} else {
-	//			err := chatmessage.SendGroupMsg(groupid.GrpID(so.Param[1]), so.Param[0])
-	//			if err != nil {
-	//				msg = err.Error()
-	//			} else {
-	//				msg = "Send Message Successful"
-	//			}
-	//		}
-	//	}
-	//case cmdcommon.CMD_LISTEN_GROUP:
-	//	if len(so.Param) != 2 {
-	//		msg = "Param error"
-	//	} else {
-	//		if !groupid.GrpID(so.Param[0]).IsValid() {
-	//			msg = "not a valid group id"
-	//		} else {
-	//			msg = chatmessage.GCListen(groupid.GrpID(so.Param[0]), so.Param[1])
-	//		}
-	//	}
-	//case cmdcommon.CMD_QUIT_LISTEN_GROUP:
-	//	if len(so.Param) != 1 {
-	//		msg = "Param error"
-	//	} else {
-	//		if !groupid.GrpID(so.Param[0]).IsValid() {
-	//			msg = "not a valid group id"
-	//		} else {
-	//			msg = chatmessage.StopGCListen(groupid.GrpID(so.Param[0]))
-	//		}
-	//	}
+	case cmdcommon.CMD_RUN:
+		msg = cso.run(so.Param[0])
+	case cmdcommon.CMD_SHOW_ETH_PRICE:
+		msg = cso.ethPrice(so.Param[0])
 	default:
 		return encapResp("Command Not Found"), nil
 	}
@@ -151,21 +31,58 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 	return encapResp(msg), nil
 }
 
-//
-//func (cso *CmdStringOPSrv) ListGroupMembers(gid string) string {
-//	cfg := config.GetCCC()
-//
-//	if cfg.SP == nil {
-//		return "Please Register first"
-//	}
-//	msg, err := chatmeta.ListGroupMembers(groupid.GrpID(gid))
-//	if err != nil {
-//		return err.Error()
-//	}
-//
-//	return msg
-//}
-//
+func (cso *CmdStringOPSrv) run(passwd string) string {
+
+	err := clientwallet.LoadWallet(passwd)
+	if err != nil {
+		return err.Error()
+	}
+
+	cfg := config.GetCBtlc()
+
+	if len(cfg.Miners) == 0 {
+		err := bootstrap.UpdateBootstrap()
+		if err != nil {
+			return err.Error()
+		}
+	}
+	cfg.Save()
+
+	return "vpn started"
+}
+
+func (cso *CmdStringOPSrv) ethPrice(month string) string {
+	ms, err := strconv.Atoi(month)
+	if err != nil {
+		return err.Error()
+	}
+	if ms <= 0 {
+		return "month must large than 1"
+	}
+
+	var cp *licenses.CurrentPrice
+	cp, err = licenses.NewCurrentPrice(int64(ms))
+	if err != nil {
+		return err.Error()
+	}
+
+	np := cp.Get()
+	if np == nil {
+		return "get price failed"
+	}
+
+	config.GetCBtlc().MemPrice = np
+
+	var j []byte
+	j, err = json.MarshalIndent(*np, " ", "\t")
+	if err != nil {
+		return err.Error()
+	}
+
+	return string(j)
+
+}
+
 //func createAccount(passwd string) string {
 //	err := chatcrypt.GenEd25519KeyAndSave(passwd)
 //	if err != nil {

@@ -41,6 +41,7 @@ var daemonCmd = &cobra.Command{
 
 		InitCfg()
 		cfg := config.GetCBtlc()
+
 		cfg.Save()
 
 		daemondir := config.GetBtlcHomeDir()
@@ -62,11 +63,7 @@ var daemonCmd = &cobra.Command{
 			return
 		}
 		defer cntxt.Release()
-		//
-		//if config.IsUserIdentifyReceived() {
-		//	config.LoadUserIdentify()
-		//}
-		//msgdrive.RegMsgDriveFunc(chatmeta.FetchGroupKey2)
+
 		cmdservice.GetCmdServerInst().StartCmdService()
 	},
 }
