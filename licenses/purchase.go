@@ -13,12 +13,12 @@ import (
 )
 
 type ClientLicenseRenew struct {
-	Transaction *common.Hash
-	Name        string
-	Email       string
-	Cell        string
-	price       *config.ClientPrice
-	license     *licenses.License
+	Transaction *common.Hash        `json:"transaction"`
+	Name        string              `json:"name"`
+	Email       string              `json:"email"`
+	Cell        string              `json:"cell"`
+	price       *config.ClientPrice `json:"price"`
+	license     *licenses.License   `json:"license"`
 }
 
 func NewClientLicenseRenew(price *config.ClientPrice, name, email, cell string) *ClientLicenseRenew {
@@ -46,7 +46,7 @@ func (clr *ClientLicenseRenew) Buy() error {
 	clr.Transaction = tx
 
 	txdb := db.GetClientTransactionDb()
-	errdb := txdb.Insert(*clr.Transaction, clr.price.Sig)
+	errdb := txdb.Insert(*clr.Transaction, clr.price, clr.Name, clr.Email, clr.Cell)
 	if errdb != nil {
 		log.Println("!!!!import!!!, transaction insert into db failed:", errdb)
 		log.Println("failed transaction is,", clr.Transaction.String(), "\r\n", clr.price.Sig.String())
@@ -72,6 +72,7 @@ func (clr *ClientLicenseRenew) GetLicense() *licenses.License {
 
 	w, err := clientwallet.GetWallet()
 	if err != nil {
+		log.Println(err.Error())
 		return nil
 	}
 	var (
@@ -82,21 +83,24 @@ func (clr *ClientLicenseRenew) GetLicense() *licenses.License {
 
 	aesk, err = w.AesKey2(cfg.BeatlesMasterAddr)
 	if err != nil {
+		log.Println(err.Error())
 		return nil
 	}
 	cipherTxt, err = lr.Marshal(aesk)
 	if err != nil {
+		log.Println(err.Error())
 		return nil
 	}
 
 	m := meta.Meta{}
-	m.Marshal(cfg.BeatlesMasterAddr.String(), cipherTxt)
+	m.Marshal(w.BtlAddress().String(), cipherTxt)
 
 	var (
 		resp string
 		code int
 	)
 
+	flag := false
 	for i := 0; i < len(cfg.Miners); i++ {
 		url := cfg.GetPurchasePath(cfg.Miners[i].Ipv4Addr, cfg.Miners[i].Port-1)
 
@@ -104,11 +108,13 @@ func (clr *ClientLicenseRenew) GetLicense() *licenses.License {
 		if err != nil || code != 200 || resp == "" {
 			continue
 		} else {
+			flag = true
 			break
 		}
 	}
 
-	if resp == "" {
+	if !flag {
+		log.Println("no response")
 		return nil
 	}
 
@@ -122,6 +128,9 @@ func (clr *ClientLicenseRenew) GetLicense() *licenses.License {
 		log.Println("!!!!import log!!!! save license failed\r\n", clr.Transaction.String(), "\r\n")
 		log.Println("license:", clr.license.String())
 	}
+
+	tdb := db.GetClientTransactionDb()
+	tdb.Use(clr.Transaction)
 
 	return clr.license
 }

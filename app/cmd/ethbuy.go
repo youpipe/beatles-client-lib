@@ -16,23 +16,39 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/giantliao/beatles-client-lib/app/cmdclient"
+	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
 	"github.com/spf13/cobra"
+	"log"
 )
 
 // buyCmd represents the buy command
+var (
+	licenseusername  string
+	licenseuseremail string
+	licenseusercell  string
+)
+
 var buyCmd = &cobra.Command{
 	Use:   "buy",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "buy from eth with price",
+	Long:  `buy from eth with price`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("buy called")
+		if _, err := cmdcommon.IsProcessStarted(); err != nil {
+			log.Println(err)
+			return
+		}
+
+		if licenseuseremail == "" {
+			log.Println("please input email")
+			return
+		}
+
+		var param []string
+
+		param = append(param, licenseusername, licenseuseremail, licenseusercell)
+
+		cmdclient.StringOpCmdSend("", cmdcommon.CMD_ETH_BUY, param)
 	},
 }
 
@@ -48,4 +64,9 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// buyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	buyCmd.Flags().StringVarP(&licenseusername, "name", "n", "", "user name")
+	buyCmd.Flags().StringVarP(&licenseuseremail, "email", "e", "", "user email address")
+	buyCmd.Flags().StringVarP(&licenseusercell, "cell", "c", "", "user cell phone")
+
 }

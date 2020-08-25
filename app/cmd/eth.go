@@ -34,7 +34,7 @@ var ethCmd = &cobra.Command{
 			return
 		}
 
-		cmdclient.DefaultCmdSend("", cmdcommon.CMD_CONFIG_SHOW)
+		cmdclient.DefaultCmdSend("", cmdcommon.CMD_ETH_BALANCE)
 	},
 }
 

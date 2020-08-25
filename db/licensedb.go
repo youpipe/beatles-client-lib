@@ -31,7 +31,7 @@ var (
 
 func newClientLicenseDb() *ClientLicenseDb {
 	cfg := config.GetCBtlc()
-	db := db.NewFileDb(cfg.GetLicenseDBPath())
+	db := db.NewFileDb(cfg.GetLicenseDBPath()).Load()
 
 	return &ClientLicenseDb{NbsDbInter: db}
 }

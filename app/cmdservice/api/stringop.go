@@ -3,11 +3,13 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
 	"github.com/giantliao/beatles-client-lib/app/cmdpb"
 	"github.com/giantliao/beatles-client-lib/bootstrap"
 	"github.com/giantliao/beatles-client-lib/clientwallet"
 	"github.com/giantliao/beatles-client-lib/config"
+	"github.com/giantliao/beatles-client-lib/db"
 	"github.com/giantliao/beatles-client-lib/licenses"
 	"strconv"
 
@@ -24,6 +26,10 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 		msg = cso.run(so.Param[0])
 	case cmdcommon.CMD_SHOW_ETH_PRICE:
 		msg = cso.ethPrice(so.Param[0])
+	case cmdcommon.CMD_ETH_BUY:
+		msg = cso.ethBuy(so.Param[0], so.Param[1], so.Param[2])
+	case cmdcommon.CMD_ETH_RENEW_LICENSE:
+		msg = cso.ethBuyLicense(so.Param[0])
 	default:
 		return encapResp("Command Not Found"), nil
 	}
@@ -78,6 +84,63 @@ func (cso *CmdStringOPSrv) ethPrice(month string) string {
 	if err != nil {
 		return err.Error()
 	}
+
+	return string(j)
+
+}
+
+func (cso *CmdStringOPSrv) ethBuy(name, email, cell string) string {
+	cfg := config.GetCBtlc()
+	if cfg.MemPrice == nil {
+		return "please get price first"
+	}
+	lr := licenses.NewClientLicenseRenew(cfg.MemPrice, name, email, cell)
+
+	err := lr.Buy()
+	if err != nil {
+		return err.Error()
+	}
+
+	tdb := db.GetClientTransactionDb()
+	if v := tdb.Find(*lr.Transaction); v != nil {
+		return v.String()
+	} else {
+		return "buy license info not in db"
+	}
+}
+
+func (cso *CmdStringOPSrv) ethBuyLicense(tx string) string {
+	tdb := db.GetClientTransactionDb()
+
+	var (
+		cti *db.ClientTranstionItem
+		err error
+	)
+
+	if tx == "" {
+		cti, err = tdb.FindLatest()
+		if err != nil {
+			return err.Error()
+		}
+	} else {
+		cti = tdb.Find(common.HexToHash(tx))
+		if cti == nil {
+			return "not found transaction"
+		}
+		if cti.Used {
+			return "transaction is used"
+		}
+	}
+
+	clr := licenses.NewClientLicenseRenew(cti.Price, cti.Name, cti.Email, cti.Cell)
+	clr.Transaction = &cti.Tx
+
+	l := clr.GetLicense()
+	if l == nil {
+		return "something wrong, get license failed"
+	}
+
+	j, _ := json.MarshalIndent(*l, " ", "\t")
 
 	return string(j)
 

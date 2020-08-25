@@ -16,45 +16,36 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/giantliao/beatles-client-lib/app/cmdclient"
-	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
-	"log"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
 
-var buyLicenseTx string
+var transactionUsedForLicense bool
 
-// licenseCmd represents the license command
-var ethlicenseCmd = &cobra.Command{
-	Use:   "license",
-	Short: "renew license by renew transaction",
-	Long:  `renew license by renew transaction`,
+// transactionCmd represents the transaction command
+var ethtransactionCmd = &cobra.Command{
+	Use:   "transaction",
+	Short: "show all transaction",
+	Long:  `show all transaction`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if _, err := cmdcommon.IsProcessStarted(); err != nil {
-			log.Println(err)
-			return
-		}
-
-		var param []string
-
-		param = append(param, buyLicenseTx)
-
-		cmdclient.StringOpCmdSend("", cmdcommon.CMD_ETH_RENEW_LICENSE, param)
-
+		fmt.Println("transaction called")
 	},
 }
 
 func init() {
-	ethCmd.AddCommand(ethlicenseCmd)
+	ethCmd.AddCommand(ethtransactionCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// licenseCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// transactionCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// licenseCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// transactionCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	ethtransactionCmd.Flags().BoolVarP(&transactionUsedForLicense, "not", "n", false, "transaction not used for license")
+
 }

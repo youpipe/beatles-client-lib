@@ -16,37 +16,23 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/giantliao/beatles-client-lib/app/cmdclient"
-	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
-	"log"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
 
-var buyLicenseTx string
-
 // licenseCmd represents the license command
-var ethlicenseCmd = &cobra.Command{
+var showlicenseCmd = &cobra.Command{
 	Use:   "license",
-	Short: "renew license by renew transaction",
-	Long:  `renew license by renew transaction`,
+	Short: "show license",
+	Long:  `show license`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if _, err := cmdcommon.IsProcessStarted(); err != nil {
-			log.Println(err)
-			return
-		}
-
-		var param []string
-
-		param = append(param, buyLicenseTx)
-
-		cmdclient.StringOpCmdSend("", cmdcommon.CMD_ETH_RENEW_LICENSE, param)
-
+		fmt.Println("license called")
 	},
 }
 
 func init() {
-	ethCmd.AddCommand(ethlicenseCmd)
+	rootCmd.AddCommand(showlicenseCmd)
 
 	// Here you will define your flags and configuration settings.
 

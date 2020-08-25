@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/giantliao/beatles-client-lib/config"
-	"github.com/giantliao/beatles-protocol/licenses"
 	"github.com/kprc/nbsnetwork/db"
 	"github.com/kprc/nbsnetwork/tools"
 	"sync"
@@ -18,10 +17,24 @@ type ClientTransactionDb struct {
 }
 
 type ClientTranstionItem struct {
-	Tx         common.Hash             `json:"-"`
-	TxSig      *licenses.NoncePriceSig `json:"tx_sig"`
-	CreateTime int64                   `json:"create_time"`
-	UpdateTime int64                   `json:"update_time"`
+	Tx         common.Hash         `json:"-"`
+	Price      *config.ClientPrice `json:"price"`
+	Name       string              `json:"name"`
+	Email      string              `json:"email"`
+	Cell       string              `json:"cell"`
+	Used       bool                `json:"used"`
+	CreateTime int64               `json:"create_time"`
+	UpdateTime int64               `json:"update_time"`
+}
+
+func (cti *ClientTranstionItem) String() string {
+	msg := cti.Tx.String() + "\r\n"
+
+	j, _ := json.MarshalIndent(*cti, " ", "\t")
+
+	msg += string(j)
+
+	return msg
 }
 
 var (
@@ -31,7 +44,7 @@ var (
 
 func newClientTransactionDb() *ClientTransactionDb {
 	cfg := config.GetCBtlc()
-	db := db.NewFileDb(cfg.GetTransactionDBPath())
+	db := db.NewFileDb(cfg.GetTransactionDBPath()).Load()
 
 	return &ClientTransactionDb{NbsDbInter: db}
 }
@@ -48,14 +61,14 @@ func GetClientTransactionDb() *ClientTransactionDb {
 	return clientTransactionStore
 }
 
-func (ctdb *ClientTransactionDb) Insert(txid common.Hash, txSig *licenses.NoncePriceSig) error {
+func (ctdb *ClientTransactionDb) Insert(txid common.Hash, price *config.ClientPrice, name, email, cell string) error {
 	ctdb.dbLock.Lock()
 	defer ctdb.dbLock.Unlock()
 
 	now := tools.GetNowMsTime()
 
 	if _, err := ctdb.NbsDbInter.Find(txid.String()); err != nil {
-		ct := &ClientTranstionItem{TxSig: txSig}
+		ct := &ClientTranstionItem{Price: price, Name: name, Cell: cell, Email: email}
 		ct.CreateTime = now
 		ct.UpdateTime = now
 
@@ -89,7 +102,6 @@ func (ctdb *ClientTransactionDb) Find(txid common.Hash) *ClientTranstionItem {
 
 		return ci
 	}
-
 }
 
 func (ctdb *ClientTransactionDb) Save() {
@@ -129,4 +141,64 @@ func (ctdb *ClientTransactionDb) Next() (txid *common.Hash, ci *ClientTranstionI
 	ci.Tx = *txid
 
 	return
+}
+
+func (ctdb *ClientTransactionDb) Use(tx *common.Hash) error {
+	ctdb.dbLock.Lock()
+	defer ctdb.dbLock.Unlock()
+
+	if v, err := ctdb.NbsDbInter.Find(tx.String()); err != nil {
+		return err
+	} else {
+		ci := &ClientTranstionItem{}
+
+		err = json.Unmarshal([]byte(v), ci)
+
+		if err != nil {
+			return err
+		}
+		if ci.Used {
+			return errors.New("transaction is used")
+		}
+
+		ci.Used = true
+
+		j, _ := json.Marshal(*ci)
+
+		ctdb.NbsDbInter.Update(tx.String(), string(j))
+
+		return nil
+	}
+}
+
+func (ctdb *ClientTransactionDb) FindLatest() (*ClientTranstionItem, error) {
+	ctdb.Iterator()
+
+	var latest *ClientTranstionItem
+
+	for {
+		k, v, err := ctdb.Next()
+		if k == nil || err != nil {
+			break
+		}
+
+		if v.Used {
+			continue
+		}
+
+		if latest == nil {
+			latest = v
+		} else {
+			if latest.UpdateTime < v.UpdateTime {
+				latest = v
+			}
+		}
+	}
+
+	if latest == nil {
+		return nil, errors.New("no record in db")
+	}
+
+	return latest, nil
+
 }
