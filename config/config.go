@@ -18,6 +18,12 @@ const (
 	BTLC_CFG_FileName = "btlclient.json"
 )
 
+type ClientPrice struct {
+	Sig          *licenses.NoncePriceSig `json:"sig"`
+	Gas          float64                 `json:"gas"`
+	EstimatedFee float64                 `json:"estimated_fee"`
+}
+
 type BtlClientConf struct {
 	BeatlesMasterAddr account.BeatleAddress `json:"beatles_master_addr"`
 	BeatlesEthAddr    string                `json:"beatles_eth_addr"`
@@ -31,14 +37,14 @@ type BtlClientConf struct {
 	LicenseSavePath     string `json:"license_save_path"`
 	TransactionSavePath string `json:"transaction_save_path"`
 
-	ApiPath        string                  `json:"api_path"`
-	NoncePricePath string                  `json:"nonce_price"`
-	PurchasePath   string                  `json:"purchase_path"`
-	ListMinerPath  string                  `json:"list_miner_path"`
-	EthBalance     float64                 `json:"-"`
-	TrxBalance     float64                 `json:"-"`
-	MemLicense     *licenses.License       `json:"-"`
-	MemPrice       *licenses.NoncePriceSig `json:"-"`
+	ApiPath        string            `json:"api_path"`
+	NoncePricePath string            `json:"nonce_price"`
+	PurchasePath   string            `json:"purchase_path"`
+	ListMinerPath  string            `json:"list_miner_path"`
+	EthBalance     float64           `json:"-"`
+	TrxBalance     float64           `json:"-"`
+	MemLicense     *licenses.License `json:"-"`
+	MemPrice       *ClientPrice      `json:"-"`
 
 	GithubAddress []*miners.GithubDownLoadPoint `json:"github_address"`
 	Miners        []*miners.Miner               `json:"miners"`

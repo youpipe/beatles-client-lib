@@ -16,7 +16,9 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"github.com/giantliao/beatles-client-lib/app/cmdclient"
+	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -27,7 +29,12 @@ var ethCmd = &cobra.Command{
 	Short: "eth command",
 	Long:  `eth command`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("eth called")
+		if _, err := cmdcommon.IsProcessStarted(); err != nil {
+			log.Println(err)
+			return
+		}
+
+		cmdclient.DefaultCmdSend("", cmdcommon.CMD_CONFIG_SHOW)
 	},
 }
 

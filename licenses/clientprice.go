@@ -15,6 +15,8 @@ type CurrentPrice struct {
 	miners             []*miners.Miner
 	licenseBeatlesAddr account.BeatleAddress
 	nonce              uint64
+	gas                float64
+	fee                float64
 	selfBeatlesAddr    account.BeatleAddress
 	selfEthAddr        common.Address
 	month              int64
@@ -48,11 +50,16 @@ func (cp *CurrentPrice) init() error {
 		return err
 	}
 
+	cp.gas, cp.fee, err = w.Gas()
+	if err != nil {
+		return err
+	}
+
 	return nil
 
 }
 
-func (cp *CurrentPrice) Get() *licenses.NoncePriceSig {
+func (cp *CurrentPrice) Get() *config.ClientPrice {
 	if cp.miners == nil {
 		return nil
 	}
@@ -91,21 +98,26 @@ func (cp *CurrentPrice) Get() *licenses.NoncePriceSig {
 
 	cfg := config.GetCBtlc()
 
+	flag := false
 	//todo... post to random miner
 	for i := 0; i < len(cp.miners); i++ {
-		url := cfg.GetNoncePriceWebPath(cp.miners[i].Ipv4Addr, cp.miners[i].Port)
+		url := cfg.GetNoncePriceWebPath(cp.miners[i].Ipv4Addr, cp.miners[i].Port-1)
 		resp, code, err = httputil.Post(url, m.ContentS, true)
 		if err != nil || code != 200 || resp == "" {
 			continue
 		} else {
+			flag = true
 			break
 		}
 	}
-	if resp == "" {
+	if !flag {
 		return nil
 	}
 
-	return cp.UnPackResp(aesk, resp)
+	sig := cp.UnPackResp(aesk, resp)
+
+	return &config.ClientPrice{Sig: sig, Gas: cp.gas, EstimatedFee: cp.fee}
+
 }
 
 func (cp *CurrentPrice) UnPackResp(key []byte, respstr string) *licenses.NoncePriceSig {
@@ -117,7 +129,7 @@ func (cp *CurrentPrice) UnPackResp(key []byte, respstr string) *licenses.NoncePr
 
 	nps := &licenses.NoncePriceSig{}
 
-	if err = nps.UnMarshal(key, m.Content); err != nil {
+	if err = nps.UnMarshal(key, cipherTxt); err != nil {
 		return nil
 	}
 

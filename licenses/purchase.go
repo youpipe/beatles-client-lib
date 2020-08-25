@@ -17,16 +17,16 @@ type ClientLicenseRenew struct {
 	Name        string
 	Email       string
 	Cell        string
-	sig         *licenses.NoncePriceSig
+	price       *config.ClientPrice
 	license     *licenses.License
 }
 
-func NewClientLicenseRenew(sig *licenses.NoncePriceSig, name, email, cell string) *ClientLicenseRenew {
-	return &ClientLicenseRenew{sig: sig, Name: name, Cell: cell, Email: email}
+func NewClientLicenseRenew(price *config.ClientPrice, name, email, cell string) *ClientLicenseRenew {
+	return &ClientLicenseRenew{price: price, Name: name, Cell: cell, Email: email}
 }
 
 func (clr *ClientLicenseRenew) Buy() error {
-	if clr.sig == nil {
+	if clr.price == nil || clr.price.Sig == nil {
 		return errors.New("please get price")
 	}
 	w, err := clientwallet.GetWallet()
@@ -37,7 +37,8 @@ func (clr *ClientLicenseRenew) Buy() error {
 	cfg := config.GetCBtlc()
 	to := common.HexToAddress(cfg.BeatlesEthAddr)
 	var tx *common.Hash
-	tx, err = w.SendToWithNonce(to, clr.sig.Content.TotalEth, clr.sig.Content.Nonce)
+	ctx := &clr.price.Sig.Content
+	tx, err = w.SendToWithNonce(to, ctx.TotalEth, ctx.Nonce, clr.price.Gas)
 	if err != nil {
 		return err
 	}
@@ -45,10 +46,10 @@ func (clr *ClientLicenseRenew) Buy() error {
 	clr.Transaction = tx
 
 	txdb := db.GetClientTransactionDb()
-	errdb := txdb.Insert(*clr.Transaction, clr.sig)
+	errdb := txdb.Insert(*clr.Transaction, clr.price.Sig)
 	if errdb != nil {
 		log.Println("!!!!import!!!, transaction insert into db failed:", errdb)
-		log.Println("failed transaction is,", clr.Transaction.String(), "\r\n", clr.sig.String())
+		log.Println("failed transaction is,", clr.Transaction.String(), "\r\n", clr.price.Sig.String())
 
 		return errdb
 	}
@@ -57,13 +58,13 @@ func (clr *ClientLicenseRenew) Buy() error {
 }
 
 func (clr *ClientLicenseRenew) GetLicense() *licenses.License {
-	if clr.sig == nil || clr.Transaction == nil {
+	if clr.price == nil || clr.price.Sig == nil || clr.Transaction == nil {
 		log.Println("please invoke buy first")
 		return nil
 	}
 
 	lr := &licenses.LicenseRenew{}
-	lr.TXSig = *clr.sig
+	lr.TXSig = *clr.price.Sig
 	lr.EthTransaction = *clr.Transaction
 	lr.Name = clr.Name
 	lr.Email = clr.Email
@@ -97,7 +98,7 @@ func (clr *ClientLicenseRenew) GetLicense() *licenses.License {
 	)
 
 	for i := 0; i < len(cfg.Miners); i++ {
-		url := cfg.GetPurchasePath(cfg.Miners[i].Ipv4Addr, cfg.Miners[i].Port)
+		url := cfg.GetPurchasePath(cfg.Miners[i].Ipv4Addr, cfg.Miners[i].Port-1)
 
 		resp, code, err = httputil.Post(url, m.ContentS, true)
 		if err != nil || code != 200 || resp == "" {
@@ -134,7 +135,7 @@ func (clr *ClientLicenseRenew) UnPackResp(key []byte, respstr string) *licenses.
 
 	nps := &licenses.License{}
 
-	if err = nps.UnMarshal(key, m.Content); err != nil {
+	if err = nps.UnMarshal(key, cipherTxt); err != nil {
 		return nil
 	}
 
