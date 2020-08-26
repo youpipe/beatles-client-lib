@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/giantliao/beatles-client-lib/clientwallet"
 	"github.com/giantliao/beatles-client-lib/config"
+	"github.com/giantliao/beatles-client-lib/db"
 	"github.com/giantliao/beatles-protocol/licenses"
 	"github.com/giantliao/beatles-protocol/meta"
 	"github.com/giantliao/beatles-protocol/miners"
@@ -18,6 +19,12 @@ type ClientMiners struct {
 func NewClientMiners() *ClientMiners {
 	cm := &ClientMiners{}
 	cfg := config.GetCBtlc()
+
+	if cfg.MemLicense == nil {
+		ldb := db.GetClientLicenseDb()
+		cli := ldb.FindNewestLicense()
+		cfg.MemLicense = cli.License
+	}
 
 	cm.license = cfg.MemLicense
 
@@ -39,7 +46,9 @@ func (cm *ClientMiners) FlushMiners() error {
 		cipherTxt []byte
 	)
 
-	aesk, err = w.AesKey2(w.BtlAddress())
+	cfg := config.GetCBtlc()
+
+	aesk, err = w.AesKey2(cfg.BeatlesMasterAddr)
 	if err != nil {
 		return err
 	}
@@ -53,24 +62,25 @@ func (cm *ClientMiners) FlushMiners() error {
 
 	m.Marshal(w.BtlAddress().String(), cipherTxt)
 
-	cfg := config.GetCBtlc()
-
 	var (
 		resp string
 		code int
 	)
 
+	flag := false
+
 	for i := 0; i < len(cfg.Miners); i++ {
-		url := cfg.GetListMinerPath(cfg.Miners[i].Ipv4Addr, cfg.Miners[i].Port)
+		url := cfg.GetListMinerPath(cfg.Miners[i].Ipv4Addr, cfg.Miners[i].Port-1)
 		resp, code, err = httputil.Post(url, m.ContentS, true)
 		if err != nil || code != 200 || resp == "" {
 			continue
 		} else {
+			flag = true
 			break
 		}
 	}
 
-	if resp == "" {
+	if !flag {
 		return errors.New("no miners")
 	}
 
@@ -97,7 +107,7 @@ func (cm *ClientMiners) UnPackResp(key []byte, respstr string) *miners.BestMiner
 
 	ms := &miners.BestMiners{}
 
-	if err = ms.UnMarshal(key, m.Content); err != nil {
+	if err = ms.UnMarshal(key, cipherTxt); err != nil {
 		return nil
 	}
 

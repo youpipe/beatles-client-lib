@@ -5,10 +5,8 @@ const (
 	CMD_CONFIG_SHOW int32 = 2
 	CMD_PK_SHOW     int32 = 3
 	CMD_ETH_BALANCE int32 = 4
-	//CMD_RUN         int32 = 4
-	CMD_LIST_FRIEND int32 = 5
-	CMD_LIST_GROUP  int32 = 6
-	CMD_REFRESH_ALL int32 = 7
+	CMD_MINER_SHOW  int32 = 5
+	CMD_MINER_FLUSH int32 = 6
 )
 
 const (

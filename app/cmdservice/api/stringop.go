@@ -42,12 +42,6 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 }
 
 func (cso *CmdStringOPSrv) run(passwd string) string {
-
-	err := clientwallet.LoadWallet(passwd)
-	if err != nil {
-		return err.Error()
-	}
-
 	cfg := config.GetCBtlc()
 
 	if len(cfg.Miners) == 0 {
@@ -55,6 +49,11 @@ func (cso *CmdStringOPSrv) run(passwd string) string {
 		if err != nil {
 			return err.Error()
 		}
+	}
+
+	err := clientwallet.LoadWallet(passwd)
+	if err != nil {
+		return err.Error()
 	}
 	cfg.Save()
 

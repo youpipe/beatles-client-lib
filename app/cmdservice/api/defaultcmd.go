@@ -7,6 +7,7 @@ import (
 	"github.com/giantliao/beatles-client-lib/app/cmdpb"
 	"github.com/giantliao/beatles-client-lib/clientwallet"
 	"github.com/giantliao/beatles-client-lib/config"
+	"github.com/giantliao/beatles-client-lib/miners"
 	"strconv"
 	"time"
 )
@@ -27,6 +28,10 @@ func (cds *CmdDefaultServer) DefaultCmdDo(ctx context.Context,
 		msg = cds.configShow()
 	case cmdcommon.CMD_ETH_BALANCE:
 		msg = cds.ehtBalance()
+	case cmdcommon.CMD_MINER_SHOW:
+		msg = cds.showAllMiners()
+	case cmdcommon.CMD_MINER_FLUSH:
+		msg = cds.flushMiner()
 	}
 
 	if msg == "" {
@@ -83,4 +88,30 @@ func (cds *CmdDefaultServer) ehtBalance() string {
 	msg += "\r\nBeatles Address: " + w.BtlAddress().String()
 
 	return msg + "\r\nEth Balance: " + strconv.FormatFloat(b, 'f', -1, 64)
+}
+
+func (cds *CmdDefaultServer) showAllMiners() string {
+	cfg := config.GetCBtlc()
+
+	if len(cfg.Miners) == 0 {
+		return "no miner"
+	}
+
+	j, _ := json.MarshalIndent(cfg.Miners, " ", "\t")
+
+	return string(j)
+
+}
+
+func (cds *CmdDefaultServer) flushMiner() string {
+	flushMachine := miners.NewClientMiners()
+	if flushMachine == nil {
+		return "may be you are no license"
+	}
+
+	if err := flushMachine.FlushMiners(); err != nil {
+		return err.Error()
+	}
+
+	return "flush miners success, miner count: " + strconv.Itoa(len(config.GetCBtlc().Miners))
 }
