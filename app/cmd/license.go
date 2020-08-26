@@ -16,9 +16,16 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"github.com/giantliao/beatles-client-lib/app/cmdclient"
+	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
+	"log"
+	"strconv"
 
 	"github.com/spf13/cobra"
+)
+
+var (
+	licenseHistoryShow bool
 )
 
 // licenseCmd represents the license command
@@ -27,7 +34,18 @@ var showlicenseCmd = &cobra.Command{
 	Short: "show license",
 	Long:  `show license`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("license called")
+		if _, err := cmdcommon.IsProcessStarted(); err != nil {
+			log.Println(err)
+			return
+		}
+
+		var param []string
+
+		h := strconv.FormatBool(licenseHistoryShow)
+
+		param = append(param, h)
+
+		cmdclient.StringOpCmdSend("", cmdcommon.CMD_SHOW_LICENSE, param)
 	},
 }
 
@@ -43,4 +61,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// licenseCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	showlicenseCmd.Flags().BoolVarP(&licenseHistoryShow, "history-list", "l", false, "show history license")
+
 }

@@ -57,4 +57,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// licenseCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	ethlicenseCmd.Flags().StringVarP(&buyLicenseTx, "tx", "t", "", "transaction of eth pay for license")
+
 }

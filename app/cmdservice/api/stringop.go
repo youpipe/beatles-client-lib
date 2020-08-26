@@ -30,6 +30,10 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 		msg = cso.ethBuy(so.Param[0], so.Param[1], so.Param[2])
 	case cmdcommon.CMD_ETH_RENEW_LICENSE:
 		msg = cso.ethBuyLicense(so.Param[0])
+	case cmdcommon.CMD_SHOW_ETH_TX:
+		msg = cso.ethTx(so.Param[0])
+	case cmdcommon.CMD_SHOW_LICENSE:
+		msg = cso.licenseShow(so.Param[0])
 	default:
 		return encapResp("Command Not Found"), nil
 	}
@@ -146,135 +150,74 @@ func (cso *CmdStringOPSrv) ethBuyLicense(tx string) string {
 
 }
 
-//func createAccount(passwd string) string {
-//	err := chatcrypt.GenEd25519KeyAndSave(passwd)
-//	if err != nil {
-//		return "create account failed"
-//	}
-//
-//	chatcrypt.LoadKey(passwd)
-//
-//	addr := address.ToAddress(config.GetCCC().PubKey).String()
-//
-//	return "Address: " + addr
-//}
-//
-//func loadAccount(passwd string) string {
-//
-//	chatcrypt.LoadKey(passwd)
-//
-//	addr := address.ToAddress(config.GetCCC().PubKey).String()
-//
-//	return "load account success! \r\nAddress: " + addr
-//}
-//
-//func regUser(alias string, timeInterval string) string {
-//	cfg := config.GetCCC()
-//	if cfg.PrivKey == nil {
-//		return "Please load account first"
-//	}
-//
-//	tv, err := strconv.Atoi(timeInterval)
-//	if err != nil {
-//		return err.Error()
-//	}
-//
-//	if err = chatmeta.RegChat(alias, tv); err != nil {
-//		return err.Error()
-//	}
-//
-//	msg := "Registered success"
-//	msg += fmt.Sprintf("Name:%-30s ExpireTime:%-30s",
-//		cfg.SP.SignText.AliasName,
-//		int64time2string(cfg.SP.SignText.ExpireTime))
-//
-//	return msg
-//}
-//
-//func addFriend(addr string) string {
-//	cfg := config.GetCCC()
-//	if cfg.SP == nil {
-//		return "Please register first"
-//	}
-//
-//	if err := chatmeta.AddFriend(address.ChatAddress(addr)); err != nil {
-//		return err.Error()
-//	}
-//
-//	return "Add " + addr + " friend success"
-//}
-//
-//func delFriend(addr string) string {
-//	cfg := config.GetCCC()
-//	if cfg.SP == nil {
-//		return "Please register first"
-//	}
-//
-//	if err := chatmeta.DelFriend(address.ChatAddress(addr)); err != nil {
-//		return err.Error()
-//	}
-//
-//	return "Del " + addr + " friend success"
-//}
-//
-//func createGroup(name string) string {
-//	cfg := config.GetCCC()
-//
-//	if cfg.SP == nil {
-//		return "Please register first"
-//	}
-//
-//	if err := chatmeta.CreateGroup(name); err != nil {
-//		return err.Error()
-//	}
-//
-//	return "Create group " + name + " success"
-//}
-//
-//func delGroup(gid string) string {
-//	cfg := config.GetCCC()
-//
-//	if cfg.SP == nil {
-//		return "Please register first"
-//	}
-//	if !groupid.GrpID(gid).IsValid() {
-//		return "not a group id"
-//	}
-//
-//	if err := chatmeta.DelGroup(groupid.GrpID(gid)); err != nil {
-//		return err.Error()
-//	}
-//
-//	return "Delete group " + gid + " success"
-//}
-//
-//func joinGroup(groupId string, userid string) string {
-//	cfg := config.GetCCC()
-//	if cfg.SP == nil {
-//		return "Please register first"
-//	}
-//
-//	if err := chatmeta.JoinGroup(groupid.GrpID(groupId), userid); err != nil {
-//		return err.Error()
-//	}
-//
-//	return "Join group success"
-//
-//}
-//
-//func quitGroup(groupId string, userid string) string {
-//	cfg := config.GetCCC()
-//	if cfg.SP == nil {
-//		return "Please register first"
-//	}
-//
-//	if err := chatmeta.QuitGroup(groupid.GrpID(groupId), userid); err != nil {
-//		return err.Error()
-//	}
-//
-//	return "Quit group success"
-//
-//}
+func (cso *CmdStringOPSrv) ethTx(used string) string {
+	msg := ""
+	if u, err := strconv.ParseBool(used); err != nil {
+		return err.Error()
+	} else {
+		tdb := db.GetClientTransactionDb()
+		tdb.Iterator()
+		for {
+			k, v, e := tdb.Next()
+			if k == nil || e != nil {
+				break
+			}
+			if !u && v.Used {
+				continue
+			}
+			if msg != "" {
+				msg += "\r\n"
+			}
+			msg += "===================================\r\n"
+			msg += v.String()
+		}
+	}
+
+	if msg == "" {
+		return "no tx in db"
+	} else {
+		msg += "\r\n===================================="
+	}
+
+	return msg
+}
+
+func (cso *CmdStringOPSrv) licenseShow(history string) string {
+	msg := ""
+	if h, err := strconv.ParseBool(history); err != nil {
+		return err.Error()
+	} else {
+		ldb := db.GetClientLicenseDb()
+		if h {
+
+			ldb.Iterator()
+			for {
+				k, v, e := ldb.Next()
+				if k == nil || e != nil {
+					break
+				}
+				if msg != "" {
+					msg += "\r\n"
+				}
+				msg += "===================================\r\n"
+				msg += v.String()
+			}
+		} else {
+			if cli := ldb.FindNewestLicense(); cli != nil {
+				msg = "===================================\r\n"
+				msg += cli.String()
+			}
+		}
+	}
+
+	if msg == "" {
+		return "no tx in db"
+	} else {
+		msg += "\r\n===================================="
+	}
+
+	return msg
+}
 
 func int64time2string(t int64) string {
 	tm := time.Unix(t/1000, 0)

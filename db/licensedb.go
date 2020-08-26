@@ -24,6 +24,16 @@ type ClientLicenseItem struct {
 	UpdateTime int64             `json:"update_time"`
 }
 
+func (cli *ClientLicenseItem) String() string {
+	msg := "key: " + cli.Tx.String() + "\r\n"
+
+	j, _ := json.MarshalIndent(*cli, " ", "\t")
+
+	msg += string(j)
+
+	return msg
+}
+
 var (
 	clientLicenseStore     *ClientLicenseDb
 	clientLicenseStoreLock sync.Mutex
@@ -128,4 +138,28 @@ func (cldb *ClientLicenseDb) Next() (txid *common.Hash, ci *ClientLicenseItem, e
 	ci.Tx = *txid
 
 	return
+}
+
+func (cldb *ClientLicenseDb) FindNewestLicense() *ClientLicenseItem {
+	cldb.Iterator()
+
+	var maxExpire *ClientLicenseItem
+
+	for {
+		k, v, e := cldb.Next()
+		if k == nil || e != nil {
+			break
+		}
+
+		if maxExpire == nil {
+			maxExpire = v
+		} else {
+			if maxExpire.License.Content.ExpireTime < v.License.Content.ExpireTime {
+				maxExpire = v
+			}
+		}
+	}
+
+	return maxExpire
+
 }

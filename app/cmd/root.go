@@ -63,7 +63,7 @@ func inputChoose() (choose string, err error) {
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "cc",
+	Use:   "beatles-client",
 	Short: "start beatles client in current shell",
 	Long:  `start beatles client in current shell`,
 	Run: func(cmd *cobra.Command, args []string) {

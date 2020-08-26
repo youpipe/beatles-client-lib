@@ -80,6 +80,7 @@ func (cds *CmdDefaultServer) ehtBalance() string {
 	}
 
 	msg := "Eth Address: " + w.AccountString()
+	msg += "\r\nBeatles Address: " + w.BtlAddress().String()
 
 	return msg + "\r\nEth Balance: " + strconv.FormatFloat(b, 'f', -1, 64)
 }

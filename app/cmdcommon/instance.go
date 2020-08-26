@@ -17,4 +17,5 @@ const (
 	CMD_ETH_BUY           int32 = 3
 	CMD_ETH_RENEW_LICENSE int32 = 4
 	CMD_SHOW_ETH_TX       int32 = 5
+	CMD_SHOW_LICENSE      int32 = 6
 )

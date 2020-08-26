@@ -28,7 +28,7 @@ type ClientTranstionItem struct {
 }
 
 func (cti *ClientTranstionItem) String() string {
-	msg := cti.Tx.String() + "\r\n"
+	msg := "key: " + cti.Tx.String() + "\r\n"
 
 	j, _ := json.MarshalIndent(*cti, " ", "\t")
 
@@ -138,7 +138,7 @@ func (ctdb *ClientTransactionDb) Next() (txid *common.Hash, ci *ClientTranstionI
 	id := common.HexToHash(k)
 	txid = &id
 
-	ci.Tx = *txid
+	ci.Tx = id
 
 	return
 }

@@ -16,9 +16,11 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/giantliao/beatles-client-lib/app/cmdclient"
+	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
 	"github.com/spf13/cobra"
+	"log"
+	"strconv"
 )
 
 var transactionUsedForLicense bool
@@ -29,7 +31,18 @@ var ethtransactionCmd = &cobra.Command{
 	Short: "show all transaction",
 	Long:  `show all transaction`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("transaction called")
+		if _, err := cmdcommon.IsProcessStarted(); err != nil {
+			log.Println(err)
+			return
+		}
+
+		var param []string
+
+		used := strconv.FormatBool(transactionUsedForLicense)
+
+		param = append(param, used)
+
+		cmdclient.StringOpCmdSend("", cmdcommon.CMD_SHOW_ETH_TX, param)
 	},
 }
 
@@ -46,6 +59,6 @@ func init() {
 	// is called directly, e.g.:
 	// transactionCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	ethtransactionCmd.Flags().BoolVarP(&transactionUsedForLicense, "not", "n", false, "transaction not used for license")
+	ethtransactionCmd.Flags().BoolVarP(&transactionUsedForLicense, "used", "u", false, "transaction not used for license")
 
 }
