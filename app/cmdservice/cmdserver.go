@@ -83,7 +83,28 @@ func (cs *cmdServer) StopCmdService() {
 	log.Println("Command line server stoped")
 }
 
+var (
+	flag         bool
+	stopflagLock sync.Mutex
+)
+
 func stop() {
+
+	if flag {
+
+		return
+	}
+
+	if !flag {
+		stopflagLock.Lock()
+		defer stopflagLock.Unlock()
+
+		if flag {
+			return
+		}
+
+		flag = true
+	}
 
 	//httpservice.StopWebDaemon()
 	GetCmdServerInst().StopCmdService()

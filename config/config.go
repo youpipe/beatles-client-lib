@@ -33,6 +33,8 @@ type BtlClientConf struct {
 
 	CmdListenPort       string `json:"cmdlistenport"`
 	HttpServerPort      int    `json:"http_server_port"`
+	StreamServerPort    int    `json:"stream_server_port"`
+	StreamServerPacPort int    `json:"stream_server_pac_port"`
 	WalletSavePath      string `json:"wallet_save_path"`
 	LicenseSavePath     string `json:"license_save_path"`
 	TransactionSavePath string `json:"transaction_save_path"`
@@ -57,6 +59,8 @@ var (
 
 func (bc *BtlClientConf) InitCfg() *BtlClientConf {
 	bc.HttpServerPort = 50102
+	bc.StreamServerPacPort = 50211
+	bc.StreamServerPort = 50212
 	bc.CmdListenPort = "127.0.0.1:50502"
 	bc.WalletSavePath = "wallet.json"
 	bc.LicenseSavePath = "license.db"

@@ -2,13 +2,13 @@
 a vpn client lib of beatles 
 
 //todo list
-1. bootstrap msg from github  [ok]
+[ok]1. bootstrap msg from github  
 2. support paclist
 3. client -> miner stream
 4. client setting [mac,win,linux]
-5. purchase from eth            [ok]
-6. use purchase result to get license  [ok]
-7. flush miners
+[ok] 5. purchase from eth            [ok]
+[ok] 6. use purchase result to get license  
+[ok] 7. flush miners                        
 8. start vpn
 9. miners health param [throughout, time delay, session per second]
 10. support import license
