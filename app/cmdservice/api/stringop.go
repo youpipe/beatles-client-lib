@@ -11,6 +11,7 @@ import (
 	"github.com/giantliao/beatles-client-lib/config"
 	"github.com/giantliao/beatles-client-lib/db"
 	"github.com/giantliao/beatles-client-lib/licenses"
+	"github.com/giantliao/beatles-client-lib/streamserver"
 	"strconv"
 
 	"time"
@@ -22,8 +23,8 @@ type CmdStringOPSrv struct {
 func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (*cmdpb.DefaultResp, error) {
 	msg := ""
 	switch so.Op {
-	case cmdcommon.CMD_RUN:
-		msg = cso.run(so.Param[0])
+	case cmdcommon.CMD_START:
+		msg = cso.start(so.Param[0])
 	case cmdcommon.CMD_SHOW_ETH_PRICE:
 		msg = cso.ethPrice(so.Param[0])
 	case cmdcommon.CMD_ETH_BUY:
@@ -34,6 +35,8 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 		msg = cso.ethTx(so.Param[0])
 	case cmdcommon.CMD_SHOW_LICENSE:
 		msg = cso.licenseShow(so.Param[0])
+	case cmdcommon.CMD_START_VPN:
+		msg = cso.startVpn(so.Param[0])
 	default:
 		return encapResp("Command Not Found"), nil
 	}
@@ -41,7 +44,7 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 	return encapResp(msg), nil
 }
 
-func (cso *CmdStringOPSrv) run(passwd string) string {
+func (cso *CmdStringOPSrv) start(passwd string) string {
 	cfg := config.GetCBtlc()
 
 	if len(cfg.Miners) == 0 {
@@ -57,7 +60,9 @@ func (cso *CmdStringOPSrv) run(passwd string) string {
 	}
 	cfg.Save()
 
-	return "vpn started"
+	//go streamserver.StartStreamServer()
+
+	return "client ready"
 }
 
 func (cso *CmdStringOPSrv) ethPrice(month string) string {
@@ -216,6 +221,22 @@ func (cso *CmdStringOPSrv) licenseShow(history string) string {
 	}
 
 	return msg
+}
+
+func (cso *CmdStringOPSrv) startVpn(m string) string {
+	idx, err := strconv.Atoi(m)
+	if err != nil {
+		return err.Error()
+	}
+
+	cfg := config.GetCBtlc()
+	if idx >= len(cfg.Miners) {
+		return "miner not exists"
+	}
+
+	go streamserver.StartStreamServer(idx)
+
+	return "start vpn success"
 }
 
 func int64time2string(t int64) string {

@@ -8,6 +8,7 @@ import (
 	"github.com/giantliao/beatles-client-lib/clientwallet"
 	"github.com/giantliao/beatles-client-lib/config"
 	"github.com/giantliao/beatles-client-lib/miners"
+	"github.com/giantliao/beatles-client-lib/streamserver"
 	"strconv"
 	"time"
 )
@@ -32,6 +33,8 @@ func (cds *CmdDefaultServer) DefaultCmdDo(ctx context.Context,
 		msg = cds.showAllMiners()
 	case cmdcommon.CMD_MINER_FLUSH:
 		msg = cds.flushMiner()
+	case cmdcommon.CMD_STOP_VPN:
+		msg = cds.stopVpn()
 	}
 
 	if msg == "" {
@@ -114,4 +117,10 @@ func (cds *CmdDefaultServer) flushMiner() string {
 	}
 
 	return "flush miners success, miner count: " + strconv.Itoa(len(config.GetCBtlc().Miners))
+}
+
+func (cds *CmdDefaultServer) stopVpn() string {
+	streamserver.StopStreamserver()
+
+	return "vpn stopped"
 }
