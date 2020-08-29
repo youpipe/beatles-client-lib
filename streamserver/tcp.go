@@ -1,11 +1,11 @@
 package streamserver
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/kprc/libeth/account"
+
 	"time"
 
 	"github.com/giantliao/beatles-client-lib/clientwallet"
@@ -59,9 +59,15 @@ func (cl *CloseListener) Close() error {
 }
 
 func NewStreamServer(idx int) *StreamServer {
+
 	cfg := config.GetCBtlc()
 
 	addr := ":" + strconv.Itoa(cfg.StreamServerPort)
+
+	if len(cfg.Miners)<=idx{
+		log.Println("no miners in your beatles client")
+		return nil
+	}
 
 	m := cfg.Miners[idx]
 	remoteAddr := m.Ipv4Addr + ":" + strconv.Itoa(m.Port)
@@ -75,7 +81,6 @@ func NewStreamServer(idx int) *StreamServer {
 }
 
 func (ss *StreamServer) StartServer() error {
-
 	cfg := config.GetCBtlc()
 
 	if cfg.BeatlesMasterAddr == "" {
@@ -94,8 +99,6 @@ func (ss *StreamServer) StartServer() error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("aesk is :", hex.EncodeToString(key))
 
 	copy(ss.aesKey[:], key)
 
@@ -169,7 +172,6 @@ func (ss *StreamServer) RemoteHandShake(conn net.Conn) (net.Conn, error) {
 	}
 
 	if b[0] != '1' {
-		//fmt.Println("========>",b[0],n)
 		return nil, errors.New("peer is not a server")
 	}
 
@@ -180,7 +182,6 @@ func (ss *StreamServer) RemoteHandShake(conn net.Conn) (net.Conn, error) {
 	}
 
 	j, _ := json.Marshal(*cli.License)
-
 	n, err = cs.Write(j)
 	if err != nil || n != len(j) {
 		return nil, errors.New("write license failure")
@@ -202,11 +203,8 @@ func (ss *StreamServer) RemoteHandShake(conn net.Conn) (net.Conn, error) {
 func (ss *StreamServer) handleConn(conn net.Conn) {
 	defer ss.wg.Done()
 	defer conn.Close()
-	raddrstr := conn.RemoteAddr().String()
-	defer delete(ss.session, raddrstr)
 
 	conn.(*CloseConn).Conn.(*net.TCPConn).SetKeepAlive(true)
-	ss.session[raddrstr] = conn
 
 	var (
 		tgt Addr
@@ -232,12 +230,13 @@ func (ss *StreamServer) handleConn(conn net.Conn) {
 	if tgt, err = Handshake(conn); err != nil {
 		return
 	}
-	//fmt.Println("target is",tgt.String(),hex.EncodeToString(tgt))
+
 	tgts := tgt.String()
 	if _, err = rcs.Write(tgt); err != nil {
 		log.Println("failed to send target address: ", err)
 		return
 	}
+
 	log.Println("proxy ", conn.RemoteAddr(), "<->", ss.remoteAddr, "<->", tgts)
 
 	err = relay2(conn, rcs)
@@ -250,13 +249,16 @@ func (ss *StreamServer) handleConn(conn net.Conn) {
 }
 
 func relay2(left, right net.Conn) error {
-	var wg sync.WaitGroup
-	wg.Add(1)
+	defer func() {
+		right.SetDeadline(time.Now())
+		left.SetDeadline(time.Now())
+	}()
+
+
 	go func() {
 		defer func() {
 			right.SetDeadline(time.Now())
 			left.SetDeadline(time.Now())
-			wg.Done()
 		}()
 		for {
 			buf := stream.NewStreamBuf()
@@ -288,15 +290,11 @@ func relay2(left, right net.Conn) error {
 		}
 	}
 
-	wg.Wait()
-
 	return nil
 }
 
 func (ss *StreamServer) StopServer() {
 	close(ss.quit)
 	ss.lis.Close()
-	for _, c := range ss.session {
-		c.Close()
-	}
+
 }

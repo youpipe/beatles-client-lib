@@ -55,7 +55,7 @@ func (cds *CmdDefaultServer) stop() string {
 		cds.Stop()
 	}()
 
-	return "chat client stopped"
+	return "beatles client stopped"
 }
 
 func encapResp(msg string) *cmdpb.DefaultResp {
