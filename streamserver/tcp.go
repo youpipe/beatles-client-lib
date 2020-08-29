@@ -64,7 +64,7 @@ func NewStreamServer(idx int) *StreamServer {
 
 	addr := ":" + strconv.Itoa(cfg.StreamServerPort)
 
-	if len(cfg.Miners)<=idx{
+	if len(cfg.Miners) <= idx {
 		log.Println("no miners in your beatles client")
 		return nil
 	}
@@ -253,7 +253,6 @@ func relay2(left, right net.Conn) error {
 		right.SetDeadline(time.Now())
 		left.SetDeadline(time.Now())
 	}()
-
 
 	go func() {
 		defer func() {
