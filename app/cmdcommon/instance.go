@@ -8,6 +8,7 @@ const (
 	CMD_MINER_SHOW  int32 = 5
 	CMD_MINER_FLUSH int32 = 6
 	CMD_STOP_VPN    int32 = 7
+	CMD_WALLET_SHOW int32 = 8
 )
 
 const (

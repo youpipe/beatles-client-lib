@@ -1,8 +1,10 @@
 package clientwallet
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/giantliao/beatles-client-lib/config"
+	"github.com/kprc/libeth/account"
 	"github.com/kprc/libeth/wallet"
 	"github.com/kprc/nbsnetwork/tools"
 )
@@ -50,4 +52,61 @@ func LoadWallet(auth string) error {
 	}
 
 	return nil
+}
+
+func ShowWallet() (string, error) {
+	cfg := config.GetCBtlc()
+	if !tools.FileExists(cfg.GetWalletSavePath()) {
+		return "", errors.New("no wallet")
+	}
+
+	var (
+		data []byte
+		err  error
+	)
+
+	if data, err = tools.OpenAndReadAll(cfg.GetWalletSavePath()); err != nil {
+		return "", err
+	}
+
+	wsj := &wallet.WalletSaveJson{}
+
+	if err = json.Unmarshal(data, wsj); err != nil {
+		return "", err
+	}
+
+	var (
+		ethAcct *account.AccountJson
+		btlAcct *account.CryptBTLJson
+	)
+	if wsj.EthAcct != "" {
+		if ethAcct, err = account.EthUnmarshal([]byte(wsj.EthAcct)); err != nil {
+			return "", err
+		}
+	}
+	if wsj.BtlAcct != "" {
+		if btlAcct, err = account.BeatlesUnmarshal([]byte(wsj.BtlAcct)); err != nil {
+			return "", err
+		}
+	}
+
+	var (
+		jeth []byte
+		jbtl []byte
+	)
+
+	msg := "Wallet Save Path: " + cfg.GetWalletSavePath() + "\r\n"
+
+	if ethAcct != nil {
+		jeth, _ = json.MarshalIndent(ethAcct, " ", "\t")
+		msg += "Eth Account:\r\n"
+		msg += string(jeth) + "\r\n"
+	}
+	if btlAcct != nil {
+		jbtl, _ = json.MarshalIndent(btlAcct, " ", "\t")
+		msg += "Beatles Account:\r\n"
+		msg += string(jbtl) + "\r\n"
+	}
+
+	return msg, nil
 }
