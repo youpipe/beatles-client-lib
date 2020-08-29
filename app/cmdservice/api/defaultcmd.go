@@ -9,6 +9,7 @@ import (
 	"github.com/giantliao/beatles-client-lib/config"
 	"github.com/giantliao/beatles-client-lib/miners"
 	"github.com/giantliao/beatles-client-lib/streamserver"
+	"log"
 	"strconv"
 	"time"
 )
@@ -120,6 +121,8 @@ func (cds *CmdDefaultServer) flushMiner() string {
 }
 
 func (cds *CmdDefaultServer) stopVpn() string {
+
+	log.Println("begin to stop vpn")
 	streamserver.StopStreamserver()
 
 	return "vpn stopped"

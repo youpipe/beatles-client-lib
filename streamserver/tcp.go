@@ -296,5 +296,4 @@ func relay2(left, right net.Conn) error {
 func (ss *StreamServer) StopServer() {
 	close(ss.quit)
 	ss.lis.Close()
-
 }

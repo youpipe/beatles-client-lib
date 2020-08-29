@@ -41,12 +41,15 @@ func StartStreamServer(idx int) error {
 
 	if !streamServerFlag {
 		streamServerFlagLock.Lock()
-		defer streamServerFlagLock.Unlock()
+
 		if !streamServerFlag {
 			streamServerFlag = true
 		} else {
+			streamServerFlagLock.Unlock()
 			return errors.New("vpn have started")
 		}
+
+		streamServerFlagLock.Unlock()
 	} else {
 		return errors.New("vpn have started")
 	}
