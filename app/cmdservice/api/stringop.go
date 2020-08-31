@@ -269,6 +269,9 @@ func (cso *CmdStringOPSrv) setMode(v string) string {
 	}
 
 	setting.SetProxy(m)
+
+	cfg.Save()
+
 	return "set mode success"
 }
 
