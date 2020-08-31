@@ -3,6 +3,7 @@ package cmdservice
 import (
 	"github.com/giantliao/beatles-client-lib/resource/pacserver"
 	"github.com/giantliao/beatles-client-lib/streamserver"
+	"github.com/giantliao/beatles-mac-client/setting"
 	"google.golang.org/grpc"
 	"sync"
 
@@ -82,6 +83,7 @@ func (cs *cmdServer) StopCmdService() {
 	//mem.MemStateStop()
 	pacserver.StopWebDaemon()
 	streamserver.StopStreamserver()
+	setting.ClearProxy()
 	cs.grpcServer.Stop()
 	log.Println("Command line server stoped")
 }

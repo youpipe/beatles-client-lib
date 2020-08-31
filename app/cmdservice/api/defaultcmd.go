@@ -9,6 +9,7 @@ import (
 	"github.com/giantliao/beatles-client-lib/config"
 	"github.com/giantliao/beatles-client-lib/miners"
 	"github.com/giantliao/beatles-client-lib/streamserver"
+	"github.com/giantliao/beatles-mac-client/setting"
 
 	"log"
 	"strconv"
@@ -128,6 +129,8 @@ func (cds *CmdDefaultServer) stopVpn() string {
 	log.Println("begin to stop vpn")
 	streamserver.StopStreamserver()
 	//pacserver.StopWebDaemon()
+
+	setting.ClearProxy()
 
 	return "vpn stopped"
 }

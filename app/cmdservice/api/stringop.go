@@ -13,6 +13,7 @@ import (
 	"github.com/giantliao/beatles-client-lib/licenses"
 	"github.com/giantliao/beatles-client-lib/resource/pacserver"
 	"github.com/giantliao/beatles-client-lib/streamserver"
+	"github.com/giantliao/beatles-mac-client/setting"
 	"strconv"
 
 	"time"
@@ -38,6 +39,8 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 		msg = cso.licenseShow(so.Param[0])
 	case cmdcommon.CMD_START_VPN:
 		msg = cso.startVpn(so.Param[0])
+	case cmdcommon.CMD_VPN_MODE:
+		msg = cso.setMode(so.Param[0])
 	default:
 		return encapResp("Command Not Found"), nil
 	}
@@ -242,7 +245,31 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 
 	go streamserver.StartStreamServer(idx)
 
+	setting.SetProxy(cfg.VPNMode)
+
 	return "start vpn success"
+}
+
+func (cso *CmdStringOPSrv) setMode(v string) string {
+	m, err := strconv.Atoi(v)
+	if err != nil {
+		return err.Error()
+	}
+
+	if m != 1 && m != 0 {
+		return "not a correct mode"
+	}
+
+	cfg := config.GetCBtlc()
+	oldm := cfg.VPNMode
+	cfg.VPNMode = m
+
+	if oldm == m {
+		return "nothing to do"
+	}
+
+	setting.SetProxy(m)
+	return "set mode success"
 }
 
 func int64time2string(t int64) string {
