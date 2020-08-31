@@ -23,6 +23,9 @@ func NewClientMiners() *ClientMiners {
 	if cfg.MemLicense == nil {
 		ldb := db.GetClientLicenseDb()
 		cli := ldb.FindNewestLicense()
+		if cli == nil {
+			return nil
+		}
 		cfg.MemLicense = cli.License
 	}
 
