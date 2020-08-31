@@ -11,6 +11,7 @@ import (
 	"github.com/giantliao/beatles-client-lib/config"
 	"github.com/giantliao/beatles-client-lib/db"
 	"github.com/giantliao/beatles-client-lib/licenses"
+	"github.com/giantliao/beatles-client-lib/resource/pacserver"
 	"github.com/giantliao/beatles-client-lib/streamserver"
 	"strconv"
 
@@ -235,6 +236,7 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 	}
 
 	go streamserver.StartStreamServer(idx)
+	go pacserver.StartWebDaemon()
 
 	return "start vpn success"
 }

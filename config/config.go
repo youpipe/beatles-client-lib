@@ -38,6 +38,7 @@ type BtlClientConf struct {
 	WalletSavePath      string `json:"wallet_save_path"`
 	LicenseSavePath     string `json:"license_save_path"`
 	TransactionSavePath string `json:"transaction_save_path"`
+	ScriptSavePath      string `json:"script_save_path"`
 
 	ApiPath        string            `json:"api_path"`
 	NoncePricePath string            `json:"nonce_price"`
@@ -66,6 +67,7 @@ func (bc *BtlClientConf) InitCfg() *BtlClientConf {
 	bc.WalletSavePath = "wallet.json"
 	bc.LicenseSavePath = "license.db"
 	bc.TransactionSavePath = "tx.db"
+	bc.ScriptSavePath = "gfw"
 
 	bc.ApiPath = "api"
 	bc.NoncePricePath = "price"
@@ -248,6 +250,15 @@ func (bc *BtlClientConf) GetLicenseDBPath() string {
 
 func (bc *BtlClientConf) GetTransactionDBPath() string {
 	return path.Join(GetBtlcHomeDir(), bc.TransactionSavePath)
+}
+
+func (bc *BtlClientConf) GetScriptPath() string {
+	sp := path.Join(GetBtlcHomeDir(), bc.ScriptSavePath)
+	if !tools.FileExists(sp) {
+		os.MkdirAll(sp, 0755)
+	}
+
+	return sp
 }
 
 func IsInitialized() bool {

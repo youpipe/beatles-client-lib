@@ -34,18 +34,19 @@ rpcservice := app/cmdpb
 #dhtrpc := dht/pb
 #assetdir := ui/asset
 #wifiapdir := wifiap/control
+resdir := resource
 
 proto:
 	protoc -I=$(rpcservice)  --go_out=plugins=grpc:${rpcservice}   ${rpcservice}/*.proto
 #	protoc -I=$(dhtrpc)  --go_out=plugins=grpc:${dhtrpc}   ${dhtrpc}/*.proto
 
 staticfile2bin:
-	go-bindata -o $(assetdir)/res.go -pkg=asset ui/xadmin/...
-	go-bindata -o $(wifiapdir)/res.go -pkg=control wifiap/staticfile/...
+	go-bindata -o $(resdir)/paclist/paclist.go -pkg=paclist $(resdir)/script/...
+#	go-bindata -o $(wifiapdir)/res.go -pkg=control wifiap/staticfile/...
 
 #$(TARGET): staticfile2bin proto $(SRC)
 #	@go build $(LDFLAGS) -o $(TARGET)
-$(TARGET): proto $(SRC)
+$(TARGET): staticfile2bin proto $(SRC)
 	@GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o $(TARGET)
 
 build: $(TARGET)
