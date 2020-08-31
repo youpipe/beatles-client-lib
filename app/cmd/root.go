@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/giantliao/beatles-client-lib/bootstrap"
 	"github.com/giantliao/beatles-client-lib/clientwallet"
+	"github.com/giantliao/beatles-client-lib/resource/pacserver"
 	"github.com/howeyc/gopass"
 	"os"
 
@@ -95,6 +96,8 @@ var rootCmd = &cobra.Command{
 			log.Println(err)
 			return
 		}
+
+		go pacserver.StartWebDaemon()
 
 		cfg.Save()
 

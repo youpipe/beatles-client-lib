@@ -59,9 +59,10 @@ func (cso *CmdStringOPSrv) start(passwd string) string {
 	if err != nil {
 		return err.Error()
 	}
-	cfg.Save()
 
-	//go streamserver.StartStreamServer()
+	go pacserver.StartWebDaemon()
+
+	cfg.Save()
 
 	return "client ready"
 }
@@ -235,8 +236,11 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 		return "miner not exists"
 	}
 
+	cfg.CurrentMiner = idx
+
+	cfg.Save()
+
 	go streamserver.StartStreamServer(idx)
-	go pacserver.StartWebDaemon()
 
 	return "start vpn success"
 }

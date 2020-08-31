@@ -2,6 +2,7 @@ package streamserver
 
 import (
 	"errors"
+	"log"
 	"sync"
 )
 
@@ -34,6 +35,10 @@ func GetStreamServerWithIdx(idx int) *StreamServer {
 	return streamserver
 }
 
+func DestroyStreamServer() {
+	streamserver = nil
+}
+
 func StartStreamServer(idx int) error {
 	defer func() {
 		streamServerFlag = false
@@ -59,6 +64,7 @@ func StartStreamServer(idx int) error {
 
 func StopStreamserver() {
 	if !streamServerFlag {
+		log.Println("vpn not start")
 		return
 	}
 	streamServerFlagLock.Lock()
@@ -69,5 +75,6 @@ func StopStreamserver() {
 	streamServerFlag = false
 
 	GetStreamServer().StopServer()
+	DestroyStreamServer()
 
 }

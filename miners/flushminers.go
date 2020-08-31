@@ -97,6 +97,8 @@ func (cm *ClientMiners) FlushMiners() error {
 
 	cfg.Miners = cm.miners
 
+	cfg.Save()
+
 	return nil
 
 }
