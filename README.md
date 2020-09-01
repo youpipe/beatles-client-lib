@@ -26,7 +26,7 @@ mac [first use] :
 	Eth Balance: 0  
 4. transfer some ropsten eth to [Eth Address]  
 5. ./btlclient eth price -m 12 
-6. ./btlclient eth buy  
+6. ./btlclient eth buy -e "test@abc.com" -n "test" -c "11223344" 
 7. ./btlclient eth license  
 8. ./btlclient miner flush  
 9. ./btlclient miner  
