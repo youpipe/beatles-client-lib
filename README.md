@@ -17,7 +17,7 @@ a vpn client lib of beatles
 13. support import from matamask or tronmask  
 
 ============================  
-mac:  
+mac [first use] :  
 1. ./btlclient daemon  
 2. ./btlclient start  
 3. ./btlclient eth  
@@ -25,10 +25,11 @@ mac:
 	Beatles Address: tg2KWECaThqy1uZstFyGoKBWXbkUmHaEoRyZ6Web1fHC1gfu  
 	Eth Balance: 0  
 4. transfer some ropsten eth to [Eth Address]  
-5. ./btlclient eth price -m 12  
-6. ./btlclient eth license  
-7. ./btlclient miner flush  
-8. ./btlclient miner  
+5. ./btlclient eth price -m 12 
+6. ./btlclient eth buy  
+7. ./btlclient eth license  
+8. ./btlclient miner flush  
+9. ./btlclient miner  
    [  
  	{  
  		"ipv_4_addr": "45.32.52.199",  
@@ -43,13 +44,18 @@ mac:
  		"miner_id": "tg2KYebW3jpZbqthZUSiKwhVnohKMQfSTMtn3PZqk5ZH5avS"  
  	}  
   ]  
-9. ./btlclient start vpn -m0  
+10. ./btlclient start vpn -m0  
+
+
+mac[if u have license]  
+1. ./btlclient daemon  
+2. ./btlclient start  
+3. ./btlclient start vpn -m1  
+
 
 change mode  
    ./btlclient vpnmode -m [1,0]  
 choose other miner  
    ./btlclient stop vpn  
    ./btlclient start vpn -m1  
-
-
 
