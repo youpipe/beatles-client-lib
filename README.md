@@ -15,7 +15,7 @@ a vpn client lib of beatles
 11. support export license  
 12. support export wallet  as a cipher text or  eth privacy or trx privacy  
 13. support import from matamask or tronmask  
-
+14. pack as a mac app [appify -name "beatles" -icon ./beatlesicon.png ./btlclient]  
 ============================  
 mac [first use] :  
 1. ./btlclient daemon  

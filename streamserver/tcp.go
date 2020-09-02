@@ -1,14 +1,10 @@
 package streamserver
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/kprc/libeth/account"
-	"golang.org/x/sys/unix"
-	"syscall"
-
 	"time"
 
 	"github.com/giantliao/beatles-client-lib/clientwallet"
@@ -104,21 +100,21 @@ func (ss *StreamServer) StartServer() error {
 	}
 
 	copy(ss.aesKey[:], key)
-
-	nc := net.ListenConfig{Control: func(network, address string, c syscall.RawConn) error {
-		var opErr error
-		err := c.Control(func(fd uintptr) {
-			opErr = unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_REUSEPORT, 1)
-		})
-		if err != nil {
-			return err
-		}
-		return opErr
-	}}
+	//
+	//nc := net.ListenConfig{Control: func(network, address string, c syscall.RawConn) error {
+	//	var opErr error
+	//	err := c.Control(func(fd uintptr) {
+	//		opErr = unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_REUSEPORT, 1)
+	//	})
+	//	if err != nil {
+	//		return err
+	//	}
+	//	return opErr
+	//}}
 
 	var lis net.Listener
 
-	lis, err = nc.Listen(context.Background(), "tcp", ss.addr)
+	lis, err = net.Listen("tcp", ss.addr)
 	if err != nil {
 		log.Println("failed to listen on %s" + ss.addr + " : " + err.Error())
 	}
