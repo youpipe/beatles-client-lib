@@ -5,9 +5,9 @@ import (
 	"github.com/giantliao/beatles-client-lib/streamserver"
 	"github.com/giantliao/beatles-mac-client/setting"
 	"google.golang.org/grpc"
-	"sync"
-
 	"net"
+	"sync"
+	"time"
 
 	"errors"
 	"google.golang.org/grpc/reflection"
@@ -81,9 +81,19 @@ func (cs *cmdServer) StopCmdService() {
 	//server.DNSServerStop()
 	//dohserver.GetDohDaemonServer().ShutDown()
 	//mem.MemStateStop()
-	pacserver.StopWebDaemon()
-	streamserver.StopStreamserver()
+
+	log.Println("begin to clear proxy setting")
 	setting.ClearProxy()
+
+	time.Sleep(time.Second*2)
+
+	log.Println("begin to stop pac server")
+	pacserver.StopWebDaemon()
+	log.Println("begin to stop stream server")
+	streamserver.StopStreamserver()
+
+	//time.Sleep(time.Second*3)
+	log.Println("begin to stop cmd server")
 	cs.grpcServer.Stop()
 	log.Println("Command line server stoped")
 }
