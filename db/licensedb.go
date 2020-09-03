@@ -27,9 +27,10 @@ type ClientLicenseItem struct {
 func (cli *ClientLicenseItem) String() string {
 	msg := "key: " + cli.Tx.String() + "\r\n"
 
-	j, _ := json.MarshalIndent(*cli, " ", "\t")
+	//j, _ := json.MarshalIndent(*cli, " ", "\t")
+	//j,_:=
 
-	msg += string(j)
+	msg += cli.License.String()
 
 	return msg
 }

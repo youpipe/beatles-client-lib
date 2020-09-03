@@ -251,6 +251,7 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 }
 
 func (cso *CmdStringOPSrv) setMode(v string) string {
+	//now:=tools.GetNowMsTime()
 	m, err := strconv.Atoi(v)
 	if err != nil {
 		return err.Error()
@@ -267,11 +268,11 @@ func (cso *CmdStringOPSrv) setMode(v string) string {
 	if oldm == m {
 		return "nothing to do"
 	}
-
+	//log.Print("time:",tools.GetNowMsTime() - now)
 	setting.SetProxy(m)
-
+	//log.Print("time:",tools.GetNowMsTime() - now)
 	cfg.Save()
-
+	//log.Print("time:",tools.GetNowMsTime() - now)
 	return "set mode success"
 }
 

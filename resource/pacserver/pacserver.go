@@ -5,6 +5,7 @@ import (
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/giantliao/beatles-client-lib/config"
 	"github.com/giantliao/beatles-client-lib/resource/paclist"
+	"github.com/giantliao/beatles-client-lib/resource/webfs"
 	"io/ioutil"
 	"log"
 	"path"
@@ -20,6 +21,10 @@ var webserver *http.Server
 func StartWebDaemon() {
 
 	mux := http.NewServeMux()
+
+	wfs := assetfs.AssetFS{Asset: webfs.Asset, AssetDir: webfs.AssetDir, AssetInfo: webfs.AssetInfo, Prefix: "resource/localweb"}
+
+	mux.Handle("/web/", http.StripPrefix("/web/", http.FileServer(&wfs)))
 
 	fs := assetfs.AssetFS{Asset: paclist.Asset, AssetDir: paclist.AssetDir, AssetInfo: paclist.AssetInfo, Prefix: "resource/script"}
 

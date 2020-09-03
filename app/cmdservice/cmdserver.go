@@ -78,14 +78,11 @@ func (cs *cmdServer) StartCmdService() {
 
 func (cs *cmdServer) StopCmdService() {
 	config.GetCBtlc().Save()
-	//server.DNSServerStop()
-	//dohserver.GetDohDaemonServer().ShutDown()
-	//mem.MemStateStop()
 
 	log.Println("begin to clear proxy setting")
 	setting.ClearProxy()
 
-	time.Sleep(time.Second*2)
+	time.Sleep(time.Second * 2)
 
 	log.Println("begin to stop pac server")
 	pacserver.StopWebDaemon()
