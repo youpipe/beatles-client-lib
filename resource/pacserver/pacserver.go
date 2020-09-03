@@ -8,10 +8,9 @@ import (
 	"github.com/giantliao/beatles-client-lib/resource/webfs"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"path"
 	"strconv"
-
-	"net/http"
 
 	"time"
 )
