@@ -25,13 +25,11 @@ import (
 	"github.com/giantliao/beatles-client-lib/resource/pacserver"
 	"github.com/howeyc/gopass"
 	"github.com/sevlyar/go-daemon"
+	"github.com/spf13/cobra"
 	"github.com/webview/webview"
 	"log"
 	"os"
 	"path"
-
-
-	"github.com/spf13/cobra"
 )
 
 ////var cfgFile string
@@ -81,7 +79,7 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		_, err := cmdcommon.IsProcessCanStarted()
 		if err != nil {
-			log.Println(err)
+			//log.Println(err)
 			startWebView()
 			return
 		}
