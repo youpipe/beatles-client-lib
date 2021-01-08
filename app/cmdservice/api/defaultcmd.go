@@ -105,10 +105,14 @@ func (cds *CmdDefaultServer) showAllMiners() string {
 		return "no miner"
 	}
 
-	j, _ := json.MarshalIndent(cfg.Miners, " ", "\t")
+	msg := ""
 
-	return string(j)
+	for i:=0;i<len(cfg.Miners);i++{
+		msg += cfg.Miners[i].String()
+		msg += "\r\n"
+	}
 
+	return msg
 }
 
 func (cds *CmdDefaultServer) flushMiner() string {
