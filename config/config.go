@@ -48,7 +48,7 @@ type BtlClientConf struct {
 	TrxBalance     float64           `json:"-"`
 	MemLicense     *licenses.License `json:"-"`
 	MemPrice       *ClientPrice      `json:"-"`
-	CurrentMiner   int               `json:"current_miner"`
+	CurrentMiner   account.BeatleAddress               `json:"current_miner"`
 	VPNMode        int               `json:"vpn_mode"` //1 global, 0 pac
 
 	GithubAddress []*miners.GithubDownLoadPoint `json:"github_address"`

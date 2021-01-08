@@ -237,7 +237,11 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 		return "miner not exists"
 	}
 
-	cfg.CurrentMiner = idx
+	if streamserver.StreamServerIsStart(){
+		return "server is started"
+	}
+
+	cfg.CurrentMiner = cfg.Miners[idx].MinerId
 
 	cfg.Save()
 
@@ -245,7 +249,13 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 
 	setting.SetProxy(cfg.VPNMode)
 
-	return "start vpn success"
+	mode := "global"
+
+	if cfg.VPNMode == 0{
+		mode = "pac"
+	}
+
+	return "start vpn success, miner ip: "+cfg.Miners[idx].Ipv4Addr+" vpnmode: "+mode
 }
 
 func (cso *CmdStringOPSrv) setMode(v string) string {

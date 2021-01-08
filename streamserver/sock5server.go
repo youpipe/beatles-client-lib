@@ -39,31 +39,37 @@ func DestroyStreamServer() {
 	streamserver = nil
 }
 
+func isStart() bool {
+	streamServerFlagLock.Lock()
+	defer streamServerFlagLock.Unlock()
+
+	if streamServerFlag{
+		return true
+	}
+
+	streamServerFlag = true
+
+	return false
+
+}
+func StreamServerIsStart() bool {
+	return streamServerFlag
+}
 func StartStreamServer(idx int) error {
 
-	if !streamServerFlag {
-		streamServerFlagLock.Lock()
-
-		if !streamServerFlag {
-			streamServerFlag = true
-		} else {
-			streamServerFlagLock.Unlock()
-			return errors.New("vpn have started")
-		}
-
-		streamServerFlagLock.Unlock()
-	} else {
+	if streamServerFlag  || isStart(){
 		return errors.New("vpn have started")
 	}
 
-	GetStreamServerWithIdx(idx).StartServer()
+	log.Println("begin start vpn...")
 
-	streamServerFlag = false
+	GetStreamServerWithIdx(idx).StartServer()
 
 	return nil
 }
 
 func StopStreamserver() {
+	//log.Println("1",streamServerFlag)
 	if !streamServerFlag {
 		log.Println("vpn not start")
 		return
@@ -73,7 +79,11 @@ func StopStreamserver() {
 	if !streamServerFlag {
 		return
 	}
+
+
+	//log.Println("begin stop vpn ")
 	streamServerFlag = false
+	//log.Println("2",streamServerFlag)
 
 	GetStreamServer().StopServer()
 	DestroyStreamServer()

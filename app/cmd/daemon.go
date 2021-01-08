@@ -48,8 +48,6 @@ var daemonCmd = &cobra.Command{
 		InitCfg()
 		cfg := config.GetCBtlc()
 
-
-
 		daemondir := config.GetBtlcHomeDir()
 		cntxt := daemon.Context{
 			PidFileName: path.Join(daemondir, "beatlesc.pid"),
@@ -86,6 +84,11 @@ var daemonCmd = &cobra.Command{
 				log.Println(err.Error())
 				return
 			}
+
+		}
+
+		if len(cfg.Miners) == 0{
+			panic("no miner to start vpn")
 		}
 
 
@@ -95,13 +98,27 @@ var daemonCmd = &cobra.Command{
 			return
 		}
 
-		if cfg.CurrentMiner > len(cfg.Miners){
-			cfg.CurrentMiner = 0
+		//if cfg.CurrentMiner > len(cfg.Miners){
+		//	cfg.CurrentMiner = 0
+		//}
+
+		find:=false
+		minerIdx:=0
+
+		for i:=0;i<len(cfg.Miners);i++{
+			if cfg.CurrentMiner == cfg.Miners[i].MinerId{
+				find = true
+				minerIdx = i
+				break
+			}
+		}
+		if !find{
+			cfg.CurrentMiner = cfg.Miners[0].MinerId
 		}
 
 		go pacserver.StartWebDaemon()
 
-		go streamserver.StartStreamServer(cfg.CurrentMiner)
+		go streamserver.StartStreamServer(minerIdx)
 
 		setting.SetProxy(cfg.VPNMode)
 

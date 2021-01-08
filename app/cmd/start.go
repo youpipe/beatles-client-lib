@@ -16,10 +16,8 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/giantliao/beatles-client-lib/app/cmdclient"
-	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
 	"github.com/spf13/cobra"
-	"log"
+	"fmt"
 )
 
 // runCmd represents the run command
@@ -28,27 +26,28 @@ var startCmd = &cobra.Command{
 	Short: "start beatles client",
 	Long:  `start beatles client`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if _, err := cmdcommon.IsProcessStarted(); err != nil {
-			log.Println(err)
-			return
-		}
-		var param []string
-
-		var err error
-
-		keypassword, err = inputpassword()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		param = append(param, keypassword)
-
-		cmdclient.StringOpCmdSend("", cmdcommon.CMD_START, param)
+		//if _, err := cmdcommon.IsProcessStarted(); err != nil {
+		//	log.Println(err)
+		//	return
+		//}
+		//var param []string
+		//
+		//var err error
+		//
+		//keypassword, err = inputpassword()
+		//if err != nil {
+		//	log.Println(err)
+		//	return
+		//}
+		//param = append(param, keypassword)
+		//
+		//cmdclient.StringOpCmdSend("", cmdcommon.CMD_START, param)
+		fmt.Println("nothing to do...")
 	},
 }
 
 func init() {
-	//rootCmd.AddCommand(startCmd)
+	rootCmd.AddCommand(startCmd)
 
 	// Here you will define your flags and configuration settings.
 
