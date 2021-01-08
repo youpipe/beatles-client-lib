@@ -22,9 +22,6 @@ type CmdStringOPSrv struct {
 func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (*cmdpb.DefaultResp, error) {
 	msg := ""
 	switch so.Op {
-	case cmdcommon.CMD_START:
-		//msg = cso.start(so.Param[0])
-		//obsolete
 	case cmdcommon.CMD_SHOW_ETH_PRICE:
 		msg = cso.ethPrice(so.Param[0])
 	case cmdcommon.CMD_ETH_BUY:
@@ -233,13 +230,28 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 	}
 
 	cfg := config.GetCBtlc()
-	if idx >= len(cfg.Miners) {
+	if idx >= len(cfg.Miners) || idx < -1 {
 		return "miner not exists"
 	}
 
 	if streamserver.StreamServerIsStart(){
 		return "server is started"
 	}
+
+
+	if idx == -1{
+		for i:=0;i<len(cfg.Miners);i++{
+			if cfg.Miners[i].MinerId == cfg.CurrentMiner{
+				idx = i
+				break
+			}
+		}
+	}
+
+	if idx == -1{
+		idx = 0
+	}
+
 
 	cfg.CurrentMiner = cfg.Miners[idx].MinerId
 

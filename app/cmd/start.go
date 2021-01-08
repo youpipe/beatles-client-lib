@@ -16,9 +16,15 @@ limitations under the License.
 package cmd
 
 import (
+	"github.com/giantliao/beatles-client-lib/app/cmdclient"
+	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
 	"github.com/spf13/cobra"
-	"fmt"
+
+	"log"
+	"strconv"
 )
+
+var startVpnIndex int
 
 // runCmd represents the run command
 var startCmd = &cobra.Command{
@@ -26,23 +32,16 @@ var startCmd = &cobra.Command{
 	Short: "start beatles client",
 	Long:  `start beatles client`,
 	Run: func(cmd *cobra.Command, args []string) {
-		//if _, err := cmdcommon.IsProcessStarted(); err != nil {
-		//	log.Println(err)
-		//	return
-		//}
-		//var param []string
-		//
-		//var err error
-		//
-		//keypassword, err = inputpassword()
-		//if err != nil {
-		//	log.Println(err)
-		//	return
-		//}
-		//param = append(param, keypassword)
-		//
-		//cmdclient.StringOpCmdSend("", cmdcommon.CMD_START, param)
-		fmt.Println("nothing to do...")
+		if _, err := cmdcommon.IsProcessStarted(); err != nil {
+			log.Println(err)
+			return
+		}
+
+		var param []string
+
+		param = append(param, strconv.Itoa(startVpnIndex))
+
+		cmdclient.StringOpCmdSend("", cmdcommon.CMD_START_VPN, param)
 	},
 }
 
@@ -58,4 +57,5 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	startCmd.Flags().IntVarP(&startVpnIndex, "miner-index", "m", -1, "choose a miner index to start vpn")
 }

@@ -98,10 +98,6 @@ var daemonCmd = &cobra.Command{
 			return
 		}
 
-		//if cfg.CurrentMiner > len(cfg.Miners){
-		//	cfg.CurrentMiner = 0
-		//}
-
 		find:=false
 		minerIdx:=0
 
