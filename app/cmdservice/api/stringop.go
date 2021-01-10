@@ -43,27 +43,6 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 	return encapResp(msg), nil
 }
 
-//func (cso *CmdStringOPSrv) start(passwd string) string {
-//	cfg := config.GetCBtlc()
-//
-//	if len(cfg.Miners) == 0 {
-//		err := bootstrap.UpdateBootstrap()
-//		if err != nil {
-//			return err.Error()
-//		}
-//	}
-//
-//	err := clientwallet.LoadWallet(passwd)
-//	if err != nil {
-//		return err.Error()
-//	}
-//
-//	go pacserver.StartWebDaemon()
-//
-//	cfg.Save()
-//
-//	return "client ready"
-//}
 
 func (cso *CmdStringOPSrv) ethPrice(month string) string {
 	ms, err := strconv.Atoi(month)

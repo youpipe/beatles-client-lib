@@ -30,6 +30,7 @@ type BtlClientConf struct {
 	BeatlesTrxAddr    string                `json:"beatles_trx_addr"`
 	EthAccPoint       string                `json:"eth_acc_point"`
 	TrxAccPoint       string                `json:"trx_acc_point"`
+	BTLCoinAddr       string 				`json:"btl_coin_addr"`
 
 	CmdListenPort       string `json:"cmdlistenport"`
 	HttpServerPort      int    `json:"http_server_port"`
@@ -39,6 +40,7 @@ type BtlClientConf struct {
 	LicenseSavePath     string `json:"license_save_path"`
 	TransactionSavePath string `json:"transaction_save_path"`
 	ScriptSavePath      string `json:"script_save_path"`
+	BTLCoinPrice        float64 `json:"btl_coin_price"`
 
 	ApiPath        string            `json:"api_path"`
 	NoncePricePath string            `json:"nonce_price"`

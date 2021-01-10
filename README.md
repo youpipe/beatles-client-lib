@@ -19,43 +19,26 @@ a vpn client lib of beatles
 ============================  
 mac [first use] :  
 1. ./btlclient daemon  
-2. ./btlclient start  
-3. ./btlclient eth  
+2. ./btlclient eth  
 	Eth Address: 0x778196e979839Fb5849BD2A91038f5a2C04e7e82  
 	Beatles Address: tg2KWECaThqy1uZstFyGoKBWXbkUmHaEoRyZ6Web1fHC1gfu  
 	Eth Balance: 0  
-4. transfer some ropsten eth to [Eth Address]  
-5. ./btlclient eth price -m 12 
-6. ./btlclient eth buy -e "test@abc.com" -n "test" -c "11223344" 
-7. ./btlclient eth license  
-8. ./btlclient miner flush  
-9. ./btlclient miner  
-   [  
- 	{  
- 		"ipv_4_addr": "45.32.52.199",  
- 		"port": 47911,  
- 		"location": "jp-tokyo",  
- 		"miner_id": "tg2KdqCZGCEFQxYVikUa6syBjJE6qXm7BzfUyGEzM28VJtoN"  
- 	},  
- 	{  
- 		"ipv_4_addr": "34.96.156.219",  
- 		"port": 46637,  
- 		"location": "hk-lanbery",  
- 		"miner_id": "tg2KYebW3jpZbqthZUSiKwhVnohKMQfSTMtn3PZqk5ZH5avS"  
- 	}  
-  ]  
-10. ./btlclient start vpn -m0  
+3. transfer some ropsten eth to [Eth Address]  
+4. ./btlclient eth price -m 12 
+5. ./btlclient eth buy -e "test@abc.com" -n "test" -c "11223344" 
+6. ./btlclient eth license  
+7. ./btlclient miner flush  
+8. ./btlclient miner  
+9. ./btlclient start vpn -m0  
 
 
 mac[if u have license]  
 1. ./btlclient daemon  
-2. ./btlclient start  
-3. ./btlclient start vpn -m1  
 
 
 change mode  
    ./btlclient vpnmode -m [1,0]  
-choose other miner  
+choose to other miner  
    ./btlclient stop vpn  
    ./btlclient start vpn -m1  
 

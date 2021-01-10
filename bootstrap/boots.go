@@ -63,6 +63,8 @@ func UpdateBootstrap() error {
 	cfg.BeatlesTrxAddr = btms.BeatlesTrxAddr
 	cfg.EthAccPoint = btms.EthAccPoint
 	cfg.TrxAccPoint = btms.TrxAccPoint
+	cfg.BTLCoinAddr = btms.BTLCoinAddr
+	cfg.BTLCoinPrice = btms.BTLCPrice
 
 	//update bootstrap
 	cfg.GithubAddress = btms.NextDownloadPoint
