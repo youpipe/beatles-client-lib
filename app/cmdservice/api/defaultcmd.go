@@ -105,10 +105,14 @@ func (cds *CmdDefaultServer) showAllMiners() string {
 		return "no miner"
 	}
 
-	j, _ := json.MarshalIndent(cfg.Miners, " ", "\t")
+	msg := ""
 
-	return string(j)
+	for i:=0;i<len(cfg.Miners);i++{
+		msg += cfg.Miners[i].String()
+		msg += "\r\n"
+	}
 
+	return msg
 }
 
 func (cds *CmdDefaultServer) flushMiner() string {
@@ -127,12 +131,17 @@ func (cds *CmdDefaultServer) flushMiner() string {
 func (cds *CmdDefaultServer) stopVpn() string {
 
 	log.Println("begin to stop vpn")
+
+	if !streamserver.StreamServerIsStart(){
+		return "vpn not started"
+	}
+
 	streamserver.StopStreamserver()
 	//pacserver.StopWebDaemon()
 
 	setting.ClearProxy()
 
-	return "vpn stopped"
+	return "vpn stopped, disconnected from miner: "+ config.GetCBtlc().CurrentMiner.String()
 }
 
 func (cds *CmdDefaultServer) showWallet() string {

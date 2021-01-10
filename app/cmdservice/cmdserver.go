@@ -55,6 +55,7 @@ func (cs *cmdServer) checklocaladdress() error {
 }
 
 func (cs *cmdServer) StartCmdService() {
+
 	if err := cs.checklocaladdress(); err != nil {
 		log.Fatal("Start Cmd Service Failed", err)
 		return

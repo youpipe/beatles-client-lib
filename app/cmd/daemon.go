@@ -15,6 +15,12 @@
 package cmd
 
 import (
+	"github.com/giantliao/beatles-client-lib/bootstrap"
+	"github.com/giantliao/beatles-client-lib/clientwallet"
+	"github.com/giantliao/beatles-client-lib/resource/pacserver"
+	"github.com/giantliao/beatles-client-lib/streamserver"
+	"github.com/giantliao/beatles-mac-client/setting"
+	"github.com/kprc/nbsnetwork/tools/processChan"
 	"github.com/sevlyar/go-daemon"
 	"github.com/spf13/cobra"
 	"log"
@@ -42,8 +48,6 @@ var daemonCmd = &cobra.Command{
 		InitCfg()
 		cfg := config.GetCBtlc()
 
-		cfg.Save()
-
 		daemondir := config.GetBtlcHomeDir()
 		cntxt := daemon.Context{
 			PidFileName: path.Join(daemondir, "beatlesc.pid"),
@@ -56,13 +60,67 @@ var daemonCmd = &cobra.Command{
 		}
 		d, err := cntxt.Reborn()
 		if err != nil {
+
 			log.Fatal("Unable to run: ", err)
 		}
 		if d != nil {
+			if keypassword == "" {
+				if keypassword, err = inputpassword(); err != nil {
+					log.Println(err)
+					return
+				}
+			}
+			processChan.SendPasswd(daemondir,keypassword)
 			log.Println("beatles client starting, please check log at:", path.Join(daemondir, "beatlesc.log"))
 			return
 		}
 		defer cntxt.Release()
+
+		passwd:=processChan.ReceivePasswd(daemondir)
+
+		if len(cfg.Miners) == 0{
+			err := bootstrap.UpdateBootstrap()
+			if err != nil {
+				log.Println(err.Error())
+				return
+			}
+
+		}
+
+		if len(cfg.Miners) == 0{
+			panic("no miner to start vpn")
+		}
+
+
+		err = clientwallet.LoadWallet(passwd)
+		if err != nil {
+			log.Println(err.Error())
+			return
+		}
+
+		find:=false
+		minerIdx:=0
+
+		for i:=0;i<len(cfg.Miners);i++{
+			if cfg.CurrentMiner == cfg.Miners[i].MinerId{
+				find = true
+				minerIdx = i
+				break
+			}
+		}
+		if !find{
+			cfg.CurrentMiner = cfg.Miners[0].MinerId
+		}
+
+		go pacserver.StartWebDaemon()
+
+		go streamserver.StartStreamServer(minerIdx)
+
+		setting.SetProxy(cfg.VPNMode)
+
+		cfg.Save()
+
+		log.Println("start vpn success")
 
 		cmdservice.GetCmdServerInst().StartCmdService()
 	},

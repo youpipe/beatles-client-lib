@@ -6,12 +6,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
 	"github.com/giantliao/beatles-client-lib/app/cmdpb"
-	"github.com/giantliao/beatles-client-lib/bootstrap"
-	"github.com/giantliao/beatles-client-lib/clientwallet"
 	"github.com/giantliao/beatles-client-lib/config"
 	"github.com/giantliao/beatles-client-lib/db"
 	"github.com/giantliao/beatles-client-lib/licenses"
-	"github.com/giantliao/beatles-client-lib/resource/pacserver"
 	"github.com/giantliao/beatles-client-lib/streamserver"
 	"github.com/giantliao/beatles-mac-client/setting"
 	"strconv"
@@ -25,8 +22,6 @@ type CmdStringOPSrv struct {
 func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (*cmdpb.DefaultResp, error) {
 	msg := ""
 	switch so.Op {
-	case cmdcommon.CMD_START:
-		msg = cso.start(so.Param[0])
 	case cmdcommon.CMD_SHOW_ETH_PRICE:
 		msg = cso.ethPrice(so.Param[0])
 	case cmdcommon.CMD_ETH_BUY:
@@ -48,27 +43,6 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 	return encapResp(msg), nil
 }
 
-func (cso *CmdStringOPSrv) start(passwd string) string {
-	cfg := config.GetCBtlc()
-
-	if len(cfg.Miners) == 0 {
-		err := bootstrap.UpdateBootstrap()
-		if err != nil {
-			return err.Error()
-		}
-	}
-
-	err := clientwallet.LoadWallet(passwd)
-	if err != nil {
-		return err.Error()
-	}
-
-	go pacserver.StartWebDaemon()
-
-	cfg.Save()
-
-	return "client ready"
-}
 
 func (cso *CmdStringOPSrv) ethPrice(month string) string {
 	ms, err := strconv.Atoi(month)
@@ -235,11 +209,30 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 	}
 
 	cfg := config.GetCBtlc()
-	if idx >= len(cfg.Miners) {
+	if idx >= len(cfg.Miners) || idx < -1 {
 		return "miner not exists"
 	}
 
-	cfg.CurrentMiner = idx
+	if streamserver.StreamServerIsStart(){
+		return "server is started"
+	}
+
+
+	if idx == -1{
+		for i:=0;i<len(cfg.Miners);i++{
+			if cfg.Miners[i].MinerId == cfg.CurrentMiner{
+				idx = i
+				break
+			}
+		}
+	}
+
+	if idx == -1{
+		idx = 0
+	}
+
+
+	cfg.CurrentMiner = cfg.Miners[idx].MinerId
 
 	cfg.Save()
 
@@ -247,7 +240,13 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 
 	setting.SetProxy(cfg.VPNMode)
 
-	return "start vpn success"
+	mode := "global"
+
+	if cfg.VPNMode == 0{
+		mode = "pac"
+	}
+
+	return "start vpn success, miner ip: "+cfg.Miners[idx].Ipv4Addr+" vpnmode: "+mode
 }
 
 func (cso *CmdStringOPSrv) setMode(v string) string {

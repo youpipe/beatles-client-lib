@@ -19,8 +19,12 @@ import (
 	"github.com/giantliao/beatles-client-lib/app/cmdclient"
 	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
 	"github.com/spf13/cobra"
+
 	"log"
+	"strconv"
 )
+
+var startVpnIndex int
 
 // runCmd represents the run command
 var startCmd = &cobra.Command{
@@ -32,18 +36,12 @@ var startCmd = &cobra.Command{
 			log.Println(err)
 			return
 		}
+
 		var param []string
 
-		var err error
+		param = append(param, strconv.Itoa(startVpnIndex))
 
-		keypassword, err = inputpassword()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		param = append(param, keypassword)
-
-		cmdclient.StringOpCmdSend("", cmdcommon.CMD_START, param)
+		cmdclient.StringOpCmdSend("", cmdcommon.CMD_START_VPN, param)
 	},
 }
 
@@ -59,4 +57,5 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	startCmd.Flags().IntVarP(&startVpnIndex, "miner-index", "m", -1, "choose a miner index to start vpn")
 }

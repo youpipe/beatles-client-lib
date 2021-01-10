@@ -17,19 +17,19 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
+	"github.com/giantliao/beatles-client-lib/app/cmdservice"
 	"github.com/giantliao/beatles-client-lib/bootstrap"
 	"github.com/giantliao/beatles-client-lib/clientwallet"
+	"github.com/giantliao/beatles-client-lib/config"
 	"github.com/giantliao/beatles-client-lib/resource/pacserver"
 	"github.com/howeyc/gopass"
-	"os"
-
-	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
-	"github.com/giantliao/beatles-client-lib/config"
-
-	"github.com/giantliao/beatles-client-lib/app/cmdservice"
-
+	"github.com/sevlyar/go-daemon"
 	"github.com/spf13/cobra"
+	"github.com/webview/webview"
 	"log"
+	"os"
+	"path"
 )
 
 ////var cfgFile string
@@ -62,47 +62,138 @@ func inputChoose() (choose string, err error) {
 	return string(c), nil
 }
 
+func startWebView()  {
+	debug := false
+	w := webview.New(debug)
+	defer w.Destroy()
+	w.SetTitle("beatles client")
+	w.SetSize(860, 768, webview.HintFixed)
+	w.Navigate("http://127.0.0.1:50211/web/")
+	w.Run()
+}
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "beatles-client",
 	Short: "start beatles client in current shell",
 	Long:  `start beatles client in current shell`,
 	Run: func(cmd *cobra.Command, args []string) {
-
 		_, err := cmdcommon.IsProcessCanStarted()
 		if err != nil {
-			log.Println(err)
+			//log.Println(err)
+			startWebView()
 			return
 		}
 
 		InitCfg()
 		cfg := config.GetCBtlc()
 
-		if len(cfg.Miners) == 0 {
-			err := bootstrap.UpdateBootstrap()
-			if err != nil {
-				log.Println(err)
-				return
-			}
-		}
-
-		keypassword, err = inputpassword()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		err = clientwallet.LoadWallet(keypassword)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-
-		go pacserver.StartWebDaemon()
-
 		cfg.Save()
 
+		daemondir := config.GetBtlcHomeDir()
+		cntxt := daemon.Context{
+			PidFileName: path.Join(daemondir, "beatlesc.pid"),
+			PidFilePerm: 0644,
+			LogFileName: path.Join(daemondir, "beatlesc.log"),
+			LogFilePerm: 0640,
+			WorkDir:     daemondir,
+			Umask:       027,
+			Args:        []string{},
+		}
+		d, err := cntxt.Reborn()
+		if err != nil {
+			log.Fatal("Unable to run: ", err)
+		}
+		if d != nil {
+			log.Println("beatles client starting, please check log at:", path.Join(daemondir, "beatlesc.log"))
+			startWebView()
+			return
+		}
+		defer cntxt.Release()
+		go pacserver.StartWebDaemon()
 		cmdservice.GetCmdServerInst().StartCmdService()
 	},
+}
+
+func testwebview()  {
+	_, err := cmdcommon.IsProcessCanStarted()
+	if err != nil {
+		log.Println(err)
+		startWebView()
+		return
+	}
+
+	InitCfg()
+	cfg := config.GetCBtlc()
+
+	if len(cfg.Miners) == 0 {
+		err := bootstrap.UpdateBootstrap()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
+	//
+	//keypassword, err = inputpassword()
+	//if err != nil {
+	//	log.Println(err)
+	//	return
+	//}
+	//err = clientwallet.LoadWallet(keypassword)
+	//if err != nil {
+	//	log.Println(err)
+	//	return
+	//}
+
+	go pacserver.StartWebDaemon()
+
+	cfg.Save()
+
+	go cmdservice.GetCmdServerInst().StartCmdService()
+
+	//start webui
+
+	startWebView()
+
+	log.Println("test!!!!")
+
+}
+
+
+
+func oldmain(cmd *cobra.Command, args []string)  {
+	_, err := cmdcommon.IsProcessCanStarted()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	InitCfg()
+	cfg := config.GetCBtlc()
+
+	if len(cfg.Miners) == 0 {
+		err := bootstrap.UpdateBootstrap()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
+
+	keypassword, err = inputpassword()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	err = clientwallet.LoadWallet(keypassword)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	go pacserver.StartWebDaemon()
+
+	cfg.Save()
+
+	cmdservice.GetCmdServerInst().StartCmdService()
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
