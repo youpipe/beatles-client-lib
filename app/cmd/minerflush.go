@@ -24,7 +24,7 @@ import (
 )
 
 // flushCmd represents the flush command
-var flushCmd = &cobra.Command{
+var minerflushCmd = &cobra.Command{
 	Use:   "flush",
 	Short: "flush all miners from remote",
 	Long:  `flush all miners from remote`,
@@ -39,7 +39,7 @@ var flushCmd = &cobra.Command{
 }
 
 func init() {
-	minerCmd.AddCommand(flushCmd)
+	minerCmd.AddCommand(minerflushCmd)
 
 	// Here you will define your flags and configuration settings.
 

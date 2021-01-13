@@ -11,6 +11,8 @@ import (
 	"github.com/giantliao/beatles-client-lib/licenses"
 	"github.com/giantliao/beatles-client-lib/streamserver"
 	"github.com/giantliao/beatles-mac-client/setting"
+	prolic "github.com/giantliao/beatles-protocol/licenses"
+	"github.com/kprc/libeth/account"
 	"strconv"
 
 	"time"
@@ -23,7 +25,7 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 	msg := ""
 	switch so.Op {
 	case cmdcommon.CMD_SHOW_ETH_PRICE:
-		msg = cso.ethPrice(so.Param[0])
+		msg = cso.ethPrice(so.Param[0],so.Param[1],so.Param[2])
 	case cmdcommon.CMD_ETH_BUY:
 		msg = cso.ethBuy(so.Param[0], so.Param[1], so.Param[2])
 	case cmdcommon.CMD_ETH_RENEW_LICENSE:
@@ -44,7 +46,7 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 }
 
 
-func (cso *CmdStringOPSrv) ethPrice(month string) string {
+func (cso *CmdStringOPSrv) ethPrice(month string,typ string, addr string) string {
 	ms, err := strconv.Atoi(month)
 	if err != nil {
 		return err.Error()
@@ -52,9 +54,23 @@ func (cso *CmdStringOPSrv) ethPrice(month string) string {
 	if ms <= 0 {
 		return "month must large than 1"
 	}
+	var paytyp int
+	paytyp, err = strconv.Atoi(typ)
+	if err!=nil{
+		return err.Error()
+	}
+	if paytyp != prolic.PayTypETH && paytyp != prolic.PayTypBTLC{
+		return "pay type error"
+	}
+
+	if addr != ""{
+		if !account.BeatleAddress(addr).IsValid(){
+			return "not a correct receiver address"
+		}
+	}
 
 	var cp *licenses.CurrentPrice
-	cp, err = licenses.NewCurrentPrice(int64(ms))
+	cp, err = licenses.NewCurrentPrice(int64(ms),paytyp,account.BeatleAddress(addr))
 	if err != nil {
 		return err.Error()
 	}
@@ -114,9 +130,9 @@ func (cso *CmdStringOPSrv) ethBuyLicense(tx string) string {
 		if cti == nil {
 			return "not found transaction"
 		}
-		if cti.Used {
-			return "transaction is used"
-		}
+	}
+	if cti.Used {
+		return "transaction is used"
 	}
 
 	clr := licenses.NewClientLicenseRenew(cti.Price, cti.Name, cti.Email, cti.Cell)

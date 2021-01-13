@@ -39,7 +39,7 @@ func GetBTLCoinToken() *BTLCoinToken {
 	cfg:=config.GetCBtlc()
 
 	gBTLCoinTokenInst = &BTLCoinToken{
-		ethAccessPoint: cfg.EthAccPoint,
+		ethAccessPoint: cfg.BTLCAccessPoint,
 		coinAddr: cfg.BTLCoinAddr,
 	}
 
@@ -61,16 +61,16 @@ func (bcw *BTLCoinToken)BtlCoinBalance(addr common.Address) (*big.Int,error)  {
 	return btlc.BalanceOf(nil,addr)
 }
 
-func (bcw *BTLCoinToken)BtlCoinTransfer(toAddr common.Address, tokenNum float64, key *ecdsa.PrivateKey) (hashStr string,err error) {
+func (bcw *BTLCoinToken)BtlCoinTransfer(toAddr common.Address, tokenNum float64, key *ecdsa.PrivateKey) (hashptr *common.Hash,err error) {
 	ec, err := ethclient.Dial(bcw.ethAccessPoint)
 	if err != nil {
-		return "",err
+		return nil,err
 	}
 	defer ec.Close()
 	var btlc *contract.BtlCoin
 	btlc,err = contract.NewBtlCoin(common.HexToAddress(bcw.coinAddr),ec)
 	if err!=nil {
-		return "", err
+		return nil, err
 	}
 
 	opts:=bind.NewKeyedTransactor(key)
@@ -81,10 +81,12 @@ func (bcw *BTLCoinToken)BtlCoinTransfer(toAddr common.Address, tokenNum float64,
 	tx,err = btlc.Transfer(opts,toAddr,val)
 	if err!=nil{
 		fmt.Println("BTLCoin Transer error",err.Error())
-		return "",err
+		return nil,err
 	}
 
-	return tx.Hash().String(),nil
+	hash := tx.Hash()
+
+	return &hash,nil
 }
 
 //func TransferERCToken(target string, tokenNo float64, key *ecdsa.PrivateKey) (string, error) {

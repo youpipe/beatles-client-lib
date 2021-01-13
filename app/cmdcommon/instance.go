@@ -10,6 +10,7 @@ const (
 	CMD_STOP_VPN    int32 = 7
 	CMD_WALLET_SHOW int32 = 8
 	CMD_VPN_MODE    int32 = 9
+	CMD_FRESH_LICENSE int32 = 10
 )
 
 const (

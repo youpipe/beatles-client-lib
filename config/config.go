@@ -31,6 +31,7 @@ type BtlClientConf struct {
 	EthAccPoint       string                `json:"eth_acc_point"`
 	TrxAccPoint       string                `json:"trx_acc_point"`
 	BTLCoinAddr       string 				`json:"btl_coin_addr"`
+	BTLCAccessPoint   string                `json:"btlc_access_point"`
 
 	CmdListenPort       string `json:"cmdlistenport"`
 	HttpServerPort      int    `json:"http_server_port"`
@@ -46,6 +47,7 @@ type BtlClientConf struct {
 	NoncePricePath string            `json:"nonce_price"`
 	PurchasePath   string            `json:"purchase_path"`
 	ListMinerPath  string            `json:"list_miner_path"`
+	FreshLicensePath string 		 `json:"fresh_license_path"`
 	EthBalance     float64           `json:"-"`
 	TrxBalance     float64           `json:"-"`
 	MemLicense     *licenses.License `json:"-"`
@@ -76,6 +78,7 @@ func (bc *BtlClientConf) InitCfg() *BtlClientConf {
 	bc.NoncePricePath = "price"
 	bc.PurchasePath = "purchase"
 	bc.ListMinerPath = "list"
+	bc.FreshLicensePath = "freshlic"
 
 	gd := &miners.GithubDownLoadPoint{}
 	gd.Path = "beatles.bootstrap"
@@ -240,9 +243,20 @@ func (bc *BtlClientConf) GetListMinerPath(ip string, port int) string {
 	url := "http://" + ip
 	url += ":" + strconv.Itoa(port)
 
-	pricePath := path.Join(bc.ApiPath, bc.ListMinerPath)
+	lmPath := path.Join(bc.ApiPath, bc.ListMinerPath)
 
-	url += "/" + pricePath
+	url += "/" + lmPath
+
+	return url
+}
+
+func (bc *BtlClientConf)GetFreshLicensePath(ip string, port int) string  {
+	url := "http://" + ip
+	url += ":" + strconv.Itoa(port)
+
+	flPath := path.Join(bc.ApiPath, bc.FreshLicensePath)
+
+	url += "/" + flPath
 
 	return url
 }

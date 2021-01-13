@@ -6,10 +6,14 @@ import (
 	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
 	"github.com/giantliao/beatles-client-lib/app/cmdpb"
 	"github.com/giantliao/beatles-client-lib/clientwallet"
+	"github.com/giantliao/beatles-client-lib/coin"
 	"github.com/giantliao/beatles-client-lib/config"
+	"github.com/giantliao/beatles-client-lib/licenses"
 	"github.com/giantliao/beatles-client-lib/miners"
 	"github.com/giantliao/beatles-client-lib/streamserver"
 	"github.com/giantliao/beatles-mac-client/setting"
+	"github.com/kprc/libeth/wallet"
+	"math/big"
 
 	"log"
 	"strconv"
@@ -40,6 +44,8 @@ func (cds *CmdDefaultServer) DefaultCmdDo(ctx context.Context,
 		msg = cds.stopVpn()
 	case cmdcommon.CMD_WALLET_SHOW:
 		msg = cds.showWallet()
+	case cmdcommon.CMD_FRESH_LICENSE:
+		msg = cds.freshLicense()
 	}
 
 	if msg == "" {
@@ -95,7 +101,21 @@ func (cds *CmdDefaultServer) ehtBalance() string {
 	msg := "Eth Address: " + w.AccountString()
 	msg += "\r\nBeatles Address: " + w.BtlAddress().String()
 
-	return msg + "\r\nEth Balance: " + strconv.FormatFloat(b, 'f', -1, 64)
+
+	msg += "\r\nEth Balance: " + strconv.FormatFloat(b, 'f', -1, 64)
+
+	btlc:=&big.Int{}
+
+	btlc, err = coin.GetBTLCoinToken().BtlCoinBalance(w.Address())
+	bf := wallet.BalanceHuman(btlc)
+
+
+	btlcgas,_ := w.BalanceOfGas(config.GetCBtlc().BTLCAccessPoint)
+
+	msg += "\r\nBTLC GAS: " + strconv.FormatFloat(btlcgas,'f',-1,64)
+	msg += "\r\nBTLC Balance: " + strconv.FormatFloat(bf,'f',-1,64)
+
+	return msg
 }
 
 func (cds *CmdDefaultServer) showAllMiners() string {
@@ -155,4 +175,15 @@ func (cds *CmdDefaultServer) showWallet() string {
 
 		return s
 	}
+}
+
+func (cds *CmdDefaultServer)freshLicense() string  {
+	cfl:=licenses.ClientFreshLicense{}
+
+	if err:=cfl.FreshLicense();err!=nil{
+		return err.Error()
+	}
+
+	return "get license success"
+
 }

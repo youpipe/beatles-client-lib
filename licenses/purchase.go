@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/giantliao/beatles-client-lib/clientwallet"
+	"github.com/giantliao/beatles-client-lib/coin"
 	"github.com/giantliao/beatles-client-lib/config"
 	"github.com/giantliao/beatles-client-lib/db"
 	"github.com/giantliao/beatles-protocol/licenses"
@@ -38,9 +39,16 @@ func (clr *ClientLicenseRenew) Buy() error {
 	to := common.HexToAddress(cfg.BeatlesEthAddr)
 	var tx *common.Hash
 	ctx := &clr.price.Sig.Content
-	tx, err = w.SendToWithNonce(to, ctx.TotalEth, ctx.Nonce, clr.price.Gas)
-	if err != nil {
-		return err
+	if ctx.PayTyp == licenses.PayTypETH{
+		tx, err = w.SendToWithNonce(to, ctx.TotalPrice, ctx.Nonce, clr.price.Gas)
+		if err != nil {
+			return err
+		}
+	}else{
+		tx, err = coin.GetBTLCoinToken().BtlCoinTransfer(to,ctx.TotalPrice,w.PrivKey())
+		if err != nil{
+			return err
+		}
 	}
 
 	clr.Transaction = tx
@@ -65,7 +73,7 @@ func (clr *ClientLicenseRenew) GetLicense() *licenses.License {
 
 	lr := &licenses.LicenseRenew{}
 	lr.TXSig = *clr.price.Sig
-	lr.EthTransaction = *clr.Transaction
+	lr.TxStr = clr.Transaction.String()
 	lr.Name = clr.Name
 	lr.Email = clr.Email
 	lr.Cell = clr.Cell
@@ -120,13 +128,17 @@ func (clr *ClientLicenseRenew) GetLicense() *licenses.License {
 
 	clr.license = clr.UnPackResp(aesk, resp)
 
-	cfg.MemLicense = clr.license
+	if clr.price.Sig.Content.Receiver == w.BtlAddress(){
+		cfg.MemLicense = clr.license
 
-	licensedb := db.GetClientLicenseDb()
-	errdb := licensedb.Insert(*clr.Transaction, clr.license)
-	if errdb != nil {
-		log.Println("!!!!import log!!!! save license failed\r\n", clr.Transaction.String(), "\r\n")
-		log.Println("license:", clr.license.String())
+		licensedb := db.GetClientLicenseDb()
+		errdb := licensedb.Insert(*clr.Transaction, clr.license)
+		if errdb != nil {
+			log.Println("!!!!import log!!!! save license failed\r\n", clr.Transaction.String(), "\r\n")
+			log.Println("license:", clr.license.String())
+		}
+	}else{
+		log.Printf("license for %s: \r\n%s\r\n",clr.license.Content.Receiver,clr.license.String())
 	}
 
 	tdb := db.GetClientTransactionDb()

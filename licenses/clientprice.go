@@ -20,10 +20,12 @@ type CurrentPrice struct {
 	selfBeatlesAddr    account.BeatleAddress
 	selfEthAddr        common.Address
 	month              int64
+	receiverAddr 	   account.BeatleAddress
+	payTyp             int
 }
 
-func NewCurrentPrice(month int64) (*CurrentPrice, error) {
-	cp := &CurrentPrice{month: month}
+func NewCurrentPrice(month int64,typ int, receiver account.BeatleAddress) (*CurrentPrice, error) {
+	cp := &CurrentPrice{month: month,payTyp: typ,receiverAddr: receiver}
 
 	if err := cp.init(); err != nil {
 		return nil, err
@@ -44,15 +46,20 @@ func (cp *CurrentPrice) init() error {
 	}
 	cp.selfBeatlesAddr = w.BtlAddress()
 	cp.selfEthAddr = w.Address()
-
-	cp.nonce, err = w.Nonce()
-	if err != nil {
-		return err
+	if cp.receiverAddr == ""{
+		cp.receiverAddr = cp.selfBeatlesAddr
 	}
 
-	cp.gas, cp.fee, err = w.Gas()
-	if err != nil {
-		return err
+	if cp.payTyp == licenses.PayTypETH{
+		cp.nonce, err = w.Nonce()
+		if err != nil {
+			return err
+		}
+
+		cp.gas, cp.fee, err = w.Gas()
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -67,8 +74,9 @@ func (cp *CurrentPrice) Get() *config.ClientPrice {
 	np := &licenses.NoncePrice{}
 	np.Nonce = cp.nonce
 	np.Month = cp.month
-	np.Receiver = cp.selfBeatlesAddr
-	np.EthAddr = cp.selfEthAddr
+	np.Receiver = cp.receiverAddr
+	np.Payer = cp.selfEthAddr
+	np.PayTyp = cp.payTyp
 
 	w, err := clientwallet.GetWallet()
 	if err != nil {
