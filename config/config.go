@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	BTLC_HomeDir      = ".btlclient"
+	BTLC_HomeDir      = ".beetle"
 	BTLC_CFG_FileName = "btlclient.json"
 )
 
