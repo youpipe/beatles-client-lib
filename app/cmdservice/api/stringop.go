@@ -25,7 +25,7 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 	msg := ""
 	switch so.Op {
 	case cmdcommon.CMD_SHOW_ETH_PRICE:
-		msg = cso.ethPrice(so.Param[0],so.Param[1],so.Param[2])
+		msg = cso.ethPrice(so.Param[0], so.Param[1], so.Param[2])
 	case cmdcommon.CMD_ETH_BUY:
 		msg = cso.ethBuy(so.Param[0], so.Param[1], so.Param[2])
 	case cmdcommon.CMD_ETH_RENEW_LICENSE:
@@ -45,8 +45,7 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 	return encapResp(msg), nil
 }
 
-
-func (cso *CmdStringOPSrv) ethPrice(month string,typ string, addr string) string {
+func (cso *CmdStringOPSrv) ethPrice(month string, typ string, addr string) string {
 	ms, err := strconv.Atoi(month)
 	if err != nil {
 		return err.Error()
@@ -56,21 +55,21 @@ func (cso *CmdStringOPSrv) ethPrice(month string,typ string, addr string) string
 	}
 	var paytyp int
 	paytyp, err = strconv.Atoi(typ)
-	if err!=nil{
+	if err != nil {
 		return err.Error()
 	}
-	if paytyp != prolic.PayTypETH && paytyp != prolic.PayTypBTLC{
+	if paytyp != prolic.PayTypETH && paytyp != prolic.PayTypBTLC {
 		return "pay type error"
 	}
 
-	if addr != ""{
-		if !account.BeatleAddress(addr).IsValid(){
+	if addr != "" {
+		if !account.BeatleAddress(addr).IsValid() {
 			return "not a correct receiver address"
 		}
 	}
 
 	var cp *licenses.CurrentPrice
-	cp, err = licenses.NewCurrentPrice(int64(ms),paytyp,account.BeatleAddress(addr))
+	cp, err = licenses.NewCurrentPrice(int64(ms), paytyp, account.BeatleAddress(addr))
 	if err != nil {
 		return err.Error()
 	}
@@ -229,24 +228,22 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 		return "miner not exists"
 	}
 
-	if streamserver.StreamServerIsStart(){
+	if streamserver.StreamServerIsStart() {
 		return "server is started"
 	}
 
-
-	if idx == -1{
-		for i:=0;i<len(cfg.Miners);i++{
-			if cfg.Miners[i].MinerId == cfg.CurrentMiner{
+	if idx == -1 {
+		for i := 0; i < len(cfg.Miners); i++ {
+			if cfg.Miners[i].MinerId == cfg.CurrentMiner {
 				idx = i
 				break
 			}
 		}
 	}
 
-	if idx == -1{
+	if idx == -1 {
 		idx = 0
 	}
-
 
 	cfg.CurrentMiner = cfg.Miners[idx].MinerId
 
@@ -258,11 +255,11 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 
 	mode := "global"
 
-	if cfg.VPNMode == 0{
+	if cfg.VPNMode == 0 {
 		mode = "pac"
 	}
 
-	return "start vpn success, miner ip: "+cfg.Miners[idx].Ipv4Addr+" vpnmode: "+mode
+	return "start vpn success, miner ip: " + cfg.Miners[idx].Ipv4Addr + " vpnmode: " + mode
 }
 
 func (cso *CmdStringOPSrv) setMode(v string) string {

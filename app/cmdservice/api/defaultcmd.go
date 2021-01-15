@@ -102,24 +102,21 @@ func (cds *CmdDefaultServer) ehtBalance() string {
 	msg := "Eth Address: " + w.AccountString()
 	msg += "\r\nBeatles Address: " + w.BtlAddress().String()
 
-
 	msg += "\r\nEth Balance: " + strconv.FormatFloat(b, 'f', -1, 64)
 
-	btlc:=&big.Int{}
+	btlc := &big.Int{}
 
 	btlc, err = coin.GetBTLCoinToken().BtlCoinBalance(w.Address())
 	bf := wallet.BalanceHuman(btlc)
 
-
-	btlcgas,err := w.BalanceOfGas(config.GetCBtlc().BTLCAccessPoint)
+	btlcgas, err := w.BalanceOfGas(config.GetCBtlc().BTLCAccessPoint)
 	fmt.Print(config.GetCBtlc().BTLCAccessPoint)
-	if err!=nil{
-		fmt.Println("!!!!!",err)
+	if err != nil {
+		fmt.Println("!!!!!", err)
 	}
 
-
-	msg += "\r\nBTLC GAS: " + strconv.FormatFloat(btlcgas,'f',-1,64)
-	msg += "\r\nBTLC Balance: " + strconv.FormatFloat(bf,'f',-1,64)
+	msg += "\r\nBTLC GAS: " + strconv.FormatFloat(btlcgas, 'f', -1, 64)
+	msg += "\r\nBTLC Balance: " + strconv.FormatFloat(bf, 'f', -1, 64)
 
 	return msg
 }
@@ -133,7 +130,7 @@ func (cds *CmdDefaultServer) showAllMiners() string {
 
 	msg := ""
 
-	for i:=0;i<len(cfg.Miners);i++{
+	for i := 0; i < len(cfg.Miners); i++ {
 		msg += cfg.Miners[i].String()
 		msg += "\r\n"
 	}
@@ -158,7 +155,7 @@ func (cds *CmdDefaultServer) stopVpn() string {
 
 	log.Println("begin to stop vpn")
 
-	if !streamserver.StreamServerIsStart(){
+	if !streamserver.StreamServerIsStart() {
 		return "vpn not started"
 	}
 
@@ -167,7 +164,7 @@ func (cds *CmdDefaultServer) stopVpn() string {
 
 	setting.ClearProxy()
 
-	return "vpn stopped, disconnected from miner: "+ config.GetCBtlc().CurrentMiner.String()
+	return "vpn stopped, disconnected from miner: " + config.GetCBtlc().CurrentMiner.String()
 }
 
 func (cds *CmdDefaultServer) showWallet() string {
@@ -183,10 +180,10 @@ func (cds *CmdDefaultServer) showWallet() string {
 	}
 }
 
-func (cds *CmdDefaultServer)freshLicense() string  {
-	cfl:=licenses.ClientFreshLicense{}
+func (cds *CmdDefaultServer) freshLicense() string {
+	cfl := licenses.ClientFreshLicense{}
 
-	if err:=cfl.FreshLicense();err!=nil{
+	if err := cfl.FreshLicense(); err != nil {
 		return err.Error()
 	}
 

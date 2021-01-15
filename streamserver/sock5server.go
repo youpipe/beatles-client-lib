@@ -43,7 +43,7 @@ func isStart() bool {
 	streamServerFlagLock.Lock()
 	defer streamServerFlagLock.Unlock()
 
-	if streamServerFlag{
+	if streamServerFlag {
 		return true
 	}
 
@@ -57,7 +57,7 @@ func StreamServerIsStart() bool {
 }
 func StartStreamServer(idx int) error {
 
-	if streamServerFlag  || isStart(){
+	if streamServerFlag || isStart() {
 		return errors.New("vpn have started")
 	}
 
@@ -79,7 +79,6 @@ func StopStreamserver() {
 	if !streamServerFlag {
 		return
 	}
-
 
 	//log.Println("begin stop vpn ")
 	streamServerFlag = false

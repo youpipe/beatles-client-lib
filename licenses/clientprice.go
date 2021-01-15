@@ -20,12 +20,12 @@ type CurrentPrice struct {
 	selfBeatlesAddr    account.BeatleAddress
 	selfEthAddr        common.Address
 	month              int64
-	receiverAddr 	   account.BeatleAddress
+	receiverAddr       account.BeatleAddress
 	payTyp             int
 }
 
-func NewCurrentPrice(month int64,typ int, receiver account.BeatleAddress) (*CurrentPrice, error) {
-	cp := &CurrentPrice{month: month,payTyp: typ,receiverAddr: receiver}
+func NewCurrentPrice(month int64, typ int, receiver account.BeatleAddress) (*CurrentPrice, error) {
+	cp := &CurrentPrice{month: month, payTyp: typ, receiverAddr: receiver}
 
 	if err := cp.init(); err != nil {
 		return nil, err
@@ -46,11 +46,11 @@ func (cp *CurrentPrice) init() error {
 	}
 	cp.selfBeatlesAddr = w.BtlAddress()
 	cp.selfEthAddr = w.Address()
-	if cp.receiverAddr == ""{
+	if cp.receiverAddr == "" {
 		cp.receiverAddr = cp.selfBeatlesAddr
 	}
 
-	if cp.payTyp == licenses.PayTypETH{
+	if cp.payTyp == licenses.PayTypETH {
 		cp.nonce, err = w.Nonce()
 		if err != nil {
 			return err

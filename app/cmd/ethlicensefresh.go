@@ -27,7 +27,7 @@ import (
 var ethlicensefreshCmd = &cobra.Command{
 	Use:   "fresh",
 	Short: "fresh new license",
-	Long: `fresh new license`,
+	Long:  `fresh new license`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if _, err := cmdcommon.IsProcessStarted(); err != nil {
 			log.Println(err)

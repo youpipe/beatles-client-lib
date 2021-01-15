@@ -24,7 +24,7 @@ import (
 )
 
 var buyLicenseMonth int
-var payLicenseType  int
+var payLicenseType int
 var receiverBeatlesAddr string
 
 // priceCmd represents the price command
@@ -61,6 +61,6 @@ func init() {
 	// is called directly, e.g.:
 	// priceCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	ethPriceCmd.Flags().IntVarP(&buyLicenseMonth, "month", "m", 6, "month to buy")
-	ethPriceCmd.Flags().IntVarP(&payLicenseType,"typ","t",0,"pay type [0:eth,default,1:btlc]")
-	ethPriceCmd.Flags().StringVarP(&receiverBeatlesAddr,"receiver","r","","license receiver, default is current user")
+	ethPriceCmd.Flags().IntVarP(&payLicenseType, "typ", "t", 0, "pay type [0:eth,default,1:btlc]")
+	ethPriceCmd.Flags().StringVarP(&receiverBeatlesAddr, "receiver", "r", "", "license receiver, default is current user")
 }

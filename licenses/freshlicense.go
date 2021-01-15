@@ -17,46 +17,45 @@ type ClientFreshLicense struct {
 	Flr *licenses.FreshLicensResult
 }
 
-func (cfl *ClientFreshLicense)FreshLicense() error  {
+func (cfl *ClientFreshLicense) FreshLicense() error {
 	w, err := clientwallet.GetWallet()
-	if err!=nil {
+	if err != nil {
 		return err
 	}
 
 	var (
-		aesk []byte
+		aesk      []byte
 		cipherTxt []byte
 	)
 
 	cfg := config.GetCBtlc()
 	aesk, err = w.AesKey2(cfg.BeatlesMasterAddr)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 
-	if cfl.req == nil{
+	if cfl.req == nil {
 		cfl.req = &licenses.FreshLicenseReq{
 			Receiver: w.BtlAddress(),
 		}
 	}
 
-
 	cipherTxt, err = cfl.req.Marshal(aesk)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
-	m:=&meta.Meta{}
-	m.Marshal(w.BtlAddress().String(),cipherTxt)
+	m := &meta.Meta{}
+	m.Marshal(w.BtlAddress().String(), cipherTxt)
 
 	var (
 		resp string
 		code int
 	)
 
-	flag:=false
-	for i:=0;i<len(cfg.Miners);i++{
-		url:=cfg.GetFreshLicensePath(cfg.Miners[i].Ipv4Addr,cfg.Miners[i].Port-1)
-		resp,code,err = httputil.Post(url,m.ContentS,true)
+	flag := false
+	for i := 0; i < len(cfg.Miners); i++ {
+		url := cfg.GetFreshLicensePath(cfg.Miners[i].Ipv4Addr, cfg.Miners[i].Port-1)
+		resp, code, err = httputil.Post(url, m.ContentS, true)
 
 		if err != nil || code != 200 || resp == "" {
 			continue
@@ -66,20 +65,20 @@ func (cfl *ClientFreshLicense)FreshLicense() error  {
 		}
 
 	}
-	if !flag{
+	if !flag {
 		return errors.New("no license")
 	}
 
-	cfl.Flr = cfl.unPackResp(aesk,resp)
+	cfl.Flr = cfl.unPackResp(aesk, resp)
 	if cfl.Flr == nil {
 		return errors.New("no license")
 	}
 
 	cfg.MemLicense = &cfl.Flr.License
 
-	log.Println("=========>",cfl.Flr.License.String())
+	log.Println("=========>", cfl.Flr.License.String())
 
-	hash:=common.HexToHash(cfl.Flr.TxStr)
+	hash := common.HexToHash(cfl.Flr.TxStr)
 
 	licensedb := db.GetClientLicenseDb()
 	errdb := licensedb.Insert(hash, cfg.MemLicense)
@@ -93,20 +92,19 @@ func (cfl *ClientFreshLicense)FreshLicense() error  {
 	return nil
 }
 
-func (cfl *ClientFreshLicense)unPackResp(key []byte, respstr string)  *licenses.FreshLicensResult  {
-	m:=&meta.Meta{ContentS: respstr}
+func (cfl *ClientFreshLicense) unPackResp(key []byte, respstr string) *licenses.FreshLicensResult {
+	m := &meta.Meta{ContentS: respstr}
 	_, cipherTxt, err := m.UnMarshal()
 	if err != nil || len(cipherTxt) == 0 {
 		return nil
 	}
 
-	flr:=&licenses.FreshLicensResult{}
+	flr := &licenses.FreshLicensResult{}
 
-	if err = flr.UnMarshal(key,cipherTxt);err!=nil{
+	if err = flr.UnMarshal(key, cipherTxt); err != nil {
 		return nil
 	}
 
 	return flr
 
 }
-

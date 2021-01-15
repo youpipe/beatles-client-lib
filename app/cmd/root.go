@@ -62,7 +62,7 @@ func inputChoose() (choose string, err error) {
 	return string(c), nil
 }
 
-func startWebView()  {
+func startWebView() {
 	debug := false
 	w := webview.New(debug)
 	defer w.Destroy()
@@ -71,6 +71,7 @@ func startWebView()  {
 	w.Navigate("http://127.0.0.1:50211/web/")
 	w.Run()
 }
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "beatles-client",
@@ -114,7 +115,7 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-func testwebview()  {
+func testwebview() {
 	_, err := cmdcommon.IsProcessCanStarted()
 	if err != nil {
 		log.Println(err)
@@ -158,9 +159,7 @@ func testwebview()  {
 
 }
 
-
-
-func oldmain(cmd *cobra.Command, args []string)  {
+func oldmain(cmd *cobra.Command, args []string) {
 	_, err := cmdcommon.IsProcessCanStarted()
 	if err != nil {
 		log.Println(err)

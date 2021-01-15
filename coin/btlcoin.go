@@ -15,78 +15,77 @@ import (
 	"math/big"
 )
 
-
 type BTLCoinToken struct {
 	ethAccessPoint string
-	coinAddr string
+	coinAddr       string
 }
 
 var gBTLCoinTokenInst *BTLCoinToken
 var gBTLCoinTokenLock sync.Mutex
 
 func GetBTLCoinToken() *BTLCoinToken {
-	if gBTLCoinTokenInst != nil{
+	if gBTLCoinTokenInst != nil {
 		return gBTLCoinTokenInst
 	}
 
 	gBTLCoinTokenLock.Lock()
 	defer gBTLCoinTokenLock.Unlock()
 
-	if gBTLCoinTokenInst != nil{
+	if gBTLCoinTokenInst != nil {
 		return gBTLCoinTokenInst
 	}
 
-	cfg:=config.GetCBtlc()
+	cfg := config.GetCBtlc()
 
 	gBTLCoinTokenInst = &BTLCoinToken{
 		ethAccessPoint: cfg.BTLCAccessPoint,
-		coinAddr: cfg.BTLCoinAddr,
+		coinAddr:       cfg.BTLCoinAddr,
 	}
 
 	return gBTLCoinTokenInst
 
 }
 
-func (bcw *BTLCoinToken)BtlCoinBalance(addr common.Address) (*big.Int,error)  {
+func (bcw *BTLCoinToken) BtlCoinBalance(addr common.Address) (*big.Int, error) {
 	ec, err := ethclient.Dial(bcw.ethAccessPoint)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	defer ec.Close()
 	var btlc *contract.BtlCoin
-	btlc,err=contract.NewBtlCoin(common.HexToAddress(bcw.coinAddr),ec)
-	if err!=nil{
+	btlc, err = contract.NewBtlCoin(common.HexToAddress(bcw.coinAddr), ec)
+	if err != nil {
 		return nil, err
 	}
-	return btlc.BalanceOf(nil,addr)
+	return btlc.BalanceOf(nil, addr)
 }
 
-func (bcw *BTLCoinToken)BtlCoinTransfer(toAddr common.Address, tokenNum float64, key *ecdsa.PrivateKey) (hashptr *common.Hash,err error) {
+func (bcw *BTLCoinToken) BtlCoinTransfer(toAddr common.Address, tokenNum float64, key *ecdsa.PrivateKey) (hashptr *common.Hash, err error) {
 	ec, err := ethclient.Dial(bcw.ethAccessPoint)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	defer ec.Close()
 	var btlc *contract.BtlCoin
-	btlc,err = contract.NewBtlCoin(common.HexToAddress(bcw.coinAddr),ec)
-	if err!=nil {
+	btlc, err = contract.NewBtlCoin(common.HexToAddress(bcw.coinAddr), ec)
+	if err != nil {
 		return nil, err
 	}
 
-	opts:=bind.NewKeyedTransactor(key)
-	val:=wallet.BalanceEth(tokenNum)
+	opts := bind.NewKeyedTransactor(key)
+	val := wallet.BalanceEth(tokenNum)
 
 	var tx *types.Transaction
 
-	tx,err = btlc.Transfer(opts,toAddr,val)
-	if err!=nil{
-		fmt.Println("BTLCoin Transer error",err.Error())
-		return nil,err
+	tx, err = btlc.Transfer(opts, toAddr, val)
+	if err != nil {
+		fmt.Println("BTLCoin Transer error", err.Error())
+		return nil, err
 	}
 
 	hash := tx.Hash()
 
-	return &hash,nil
+	return &hash, nil
 }
 
 //func TransferERCToken(target string, tokenNo float64, key *ecdsa.PrivateKey) (string, error) {

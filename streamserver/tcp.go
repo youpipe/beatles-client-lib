@@ -193,7 +193,7 @@ func (ss *StreamServer) RemoteHandShake(conn net.Conn) (net.Conn, error) {
 		return nil, errors.New("no license")
 	}
 
-	log.Println("license",cli.String())
+	log.Println("license", cli.String())
 
 	j, _ := json.Marshal(*cli.License)
 	n, err = cs.Write(j)

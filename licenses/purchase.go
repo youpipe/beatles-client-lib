@@ -39,14 +39,14 @@ func (clr *ClientLicenseRenew) Buy() error {
 	to := common.HexToAddress(cfg.BeatlesEthAddr)
 	var tx *common.Hash
 	ctx := &clr.price.Sig.Content
-	if ctx.PayTyp == licenses.PayTypETH{
+	if ctx.PayTyp == licenses.PayTypETH {
 		tx, err = w.SendToWithNonce(to, ctx.TotalPrice, ctx.Nonce, clr.price.Gas)
 		if err != nil {
 			return err
 		}
-	}else{
-		tx, err = coin.GetBTLCoinToken().BtlCoinTransfer(to,ctx.TotalPrice,w.PrivKey())
-		if err != nil{
+	} else {
+		tx, err = coin.GetBTLCoinToken().BtlCoinTransfer(to, ctx.TotalPrice, w.PrivKey())
+		if err != nil {
 			return err
 		}
 	}
@@ -128,7 +128,7 @@ func (clr *ClientLicenseRenew) GetLicense() *licenses.License {
 
 	clr.license = clr.UnPackResp(aesk, resp)
 
-	if clr.price.Sig.Content.Receiver == w.BtlAddress(){
+	if clr.price.Sig.Content.Receiver == w.BtlAddress() {
 		cfg.MemLicense = clr.license
 
 		licensedb := db.GetClientLicenseDb()
@@ -137,8 +137,8 @@ func (clr *ClientLicenseRenew) GetLicense() *licenses.License {
 			log.Println("!!!!import log!!!! save license failed\r\n", clr.Transaction.String(), "\r\n")
 			log.Println("license:", clr.license.String())
 		}
-	}else{
-		log.Printf("license for %s: \r\n%s\r\n",clr.license.Content.Receiver,clr.license.String())
+	} else {
+		log.Printf("license for %s: \r\n%s\r\n", clr.license.Content.Receiver, clr.license.String())
 	}
 
 	tdb := db.GetClientTransactionDb()

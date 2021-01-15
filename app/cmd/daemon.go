@@ -71,15 +71,15 @@ var daemonCmd = &cobra.Command{
 					return
 				}
 			}
-			processChan.SendPasswd(daemondir,keypassword)
+			processChan.SendPasswd(daemondir, keypassword)
 			log.Println("beatles client starting, please check log at:", path.Join(daemondir, "beatlesc.log"))
 			return
 		}
 		defer cntxt.Release()
 
-		passwd:=processChan.ReceivePasswd(daemondir)
+		passwd := processChan.ReceivePasswd(daemondir)
 
-		if len(cfg.Miners) == 0{
+		if len(cfg.Miners) == 0 {
 			err := bootstrap.UpdateBootstrap()
 			if err != nil {
 				log.Println(err.Error())
@@ -88,10 +88,9 @@ var daemonCmd = &cobra.Command{
 
 		}
 
-		if len(cfg.Miners) == 0{
+		if len(cfg.Miners) == 0 {
 			panic("no miner to start vpn")
 		}
-
 
 		err = clientwallet.LoadWallet(passwd)
 		if err != nil {
@@ -99,17 +98,17 @@ var daemonCmd = &cobra.Command{
 			return
 		}
 
-		find:=false
-		minerIdx:=0
+		find := false
+		minerIdx := 0
 
-		for i:=0;i<len(cfg.Miners);i++{
-			if cfg.CurrentMiner == cfg.Miners[i].MinerId{
+		for i := 0; i < len(cfg.Miners); i++ {
+			if cfg.CurrentMiner == cfg.Miners[i].MinerId {
 				find = true
 				minerIdx = i
 				break
 			}
 		}
-		if !find{
+		if !find {
 			cfg.CurrentMiner = cfg.Miners[0].MinerId
 		}
 

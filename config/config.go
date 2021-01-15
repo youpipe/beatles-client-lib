@@ -30,30 +30,30 @@ type BtlClientConf struct {
 	BeatlesTrxAddr    string                `json:"beatles_trx_addr"`
 	EthAccPoint       string                `json:"eth_acc_point"`
 	TrxAccPoint       string                `json:"trx_acc_point"`
-	BTLCoinAddr       string 				`json:"btl_coin_addr"`
+	BTLCoinAddr       string                `json:"btl_coin_addr"`
 	BTLCAccessPoint   string                `json:"btlc_access_point"`
 
-	CmdListenPort       string `json:"cmdlistenport"`
-	HttpServerPort      int    `json:"http_server_port"`
-	StreamServerPort    int    `json:"stream_server_port"`
-	StreamServerPacPort int    `json:"stream_server_pac_port"`
-	WalletSavePath      string `json:"wallet_save_path"`
-	LicenseSavePath     string `json:"license_save_path"`
-	TransactionSavePath string `json:"transaction_save_path"`
-	ScriptSavePath      string `json:"script_save_path"`
+	CmdListenPort       string  `json:"cmdlistenport"`
+	HttpServerPort      int     `json:"http_server_port"`
+	StreamServerPort    int     `json:"stream_server_port"`
+	StreamServerPacPort int     `json:"stream_server_pac_port"`
+	WalletSavePath      string  `json:"wallet_save_path"`
+	LicenseSavePath     string  `json:"license_save_path"`
+	TransactionSavePath string  `json:"transaction_save_path"`
+	ScriptSavePath      string  `json:"script_save_path"`
 	BTLCoinPrice        float64 `json:"btl_coin_price"`
 
-	ApiPath        string            `json:"api_path"`
-	NoncePricePath string            `json:"nonce_price"`
-	PurchasePath   string            `json:"purchase_path"`
-	ListMinerPath  string            `json:"list_miner_path"`
-	FreshLicensePath string 		 `json:"fresh_license_path"`
-	EthBalance     float64           `json:"-"`
-	TrxBalance     float64           `json:"-"`
-	MemLicense     *licenses.License `json:"-"`
-	MemPrice       *ClientPrice      `json:"-"`
-	CurrentMiner   account.BeatleAddress               `json:"current_miner"`
-	VPNMode        int               `json:"vpn_mode"` //1 global, 0 pac
+	ApiPath          string                `json:"api_path"`
+	NoncePricePath   string                `json:"nonce_price"`
+	PurchasePath     string                `json:"purchase_path"`
+	ListMinerPath    string                `json:"list_miner_path"`
+	FreshLicensePath string                `json:"fresh_license_path"`
+	EthBalance       float64               `json:"-"`
+	TrxBalance       float64               `json:"-"`
+	MemLicense       *licenses.License     `json:"-"`
+	MemPrice         *ClientPrice          `json:"-"`
+	CurrentMiner     account.BeatleAddress `json:"current_miner"`
+	VPNMode          int                   `json:"vpn_mode"` //1 global, 0 pac
 
 	GithubAddress []*miners.GithubDownLoadPoint `json:"github_address"`
 	Miners        []*miners.Miner               `json:"miners"`
@@ -251,7 +251,7 @@ func (bc *BtlClientConf) GetListMinerPath(ip string, port int) string {
 	return url
 }
 
-func (bc *BtlClientConf)GetFreshLicensePath(ip string, port int) string  {
+func (bc *BtlClientConf) GetFreshLicensePath(ip string, port int) string {
 	url := "http://" + ip
 	url += ":" + strconv.Itoa(port)
 
