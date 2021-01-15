@@ -175,6 +175,7 @@ func (ss *StreamServer) RemoteHandShake(conn net.Conn) (net.Conn, error) {
 
 	n, err = cs.Read(b)
 	if err != nil {
+		log.Println("read first handshake")
 		return nil, err
 	}
 
@@ -192,6 +193,8 @@ func (ss *StreamServer) RemoteHandShake(conn net.Conn) (net.Conn, error) {
 		return nil, errors.New("no license")
 	}
 
+	log.Println("license",cli.String())
+
 	j, _ := json.Marshal(*cli.License)
 	n, err = cs.Write(j)
 	if err != nil || n != len(j) {
@@ -200,6 +203,7 @@ func (ss *StreamServer) RemoteHandShake(conn net.Conn) (net.Conn, error) {
 
 	n, err = cs.Read(b)
 	if err != nil {
+		log.Println("read second handshake")
 		return nil, err
 	}
 

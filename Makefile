@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 # The name of the executable (default is current directory name)
 BASENAME := $(shell echo $${PWD\#\#*/})
-TARGET := btlclient
+TARGET := beetle
 .DEFAULT_GOAL: $(TARGET)
 
 # These will be provided to the target

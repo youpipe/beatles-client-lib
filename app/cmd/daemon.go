@@ -47,6 +47,7 @@ var daemonCmd = &cobra.Command{
 
 		InitCfg()
 		cfg := config.GetCBtlc()
+		cfg.Save()
 
 		daemondir := config.GetBtlcHomeDir()
 		cntxt := daemon.Context{

@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
 	"github.com/giantliao/beatles-client-lib/app/cmdpb"
 	"github.com/giantliao/beatles-client-lib/clientwallet"
@@ -110,7 +111,12 @@ func (cds *CmdDefaultServer) ehtBalance() string {
 	bf := wallet.BalanceHuman(btlc)
 
 
-	btlcgas,_ := w.BalanceOfGas(config.GetCBtlc().BTLCAccessPoint)
+	btlcgas,err := w.BalanceOfGas(config.GetCBtlc().BTLCAccessPoint)
+	fmt.Print(config.GetCBtlc().BTLCAccessPoint)
+	if err!=nil{
+		fmt.Println("!!!!!",err)
+	}
+
 
 	msg += "\r\nBTLC GAS: " + strconv.FormatFloat(btlcgas,'f',-1,64)
 	msg += "\r\nBTLC Balance: " + strconv.FormatFloat(bf,'f',-1,64)

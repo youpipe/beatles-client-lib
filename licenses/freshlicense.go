@@ -77,6 +77,8 @@ func (cfl *ClientFreshLicense)FreshLicense() error  {
 
 	cfg.MemLicense = &cfl.Flr.License
 
+	log.Println("=========>",cfl.Flr.License.String())
+
 	hash:=common.HexToHash(cfl.Flr.TxStr)
 
 	licensedb := db.GetClientLicenseDb()

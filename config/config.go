@@ -81,7 +81,8 @@ func (bc *BtlClientConf) InitCfg() *BtlClientConf {
 	bc.FreshLicensePath = "freshlic"
 
 	gd := &miners.GithubDownLoadPoint{}
-	gd.Path = "v2.bootstrap"
+	gd.Path = "v2.boostrap"
+
 	gd.Repository = "beatleslist"
 	gd.Owner = "youpipe001"
 	gd.ReadToken = "at34KdLw4XkwffHVECnD1UcU1PjW1Y"
