@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/kprc/libeth/account"
+	"syscall"
 	"time"
 
 	"github.com/giantliao/beatles-client-lib/clientwallet"
@@ -28,6 +29,9 @@ type StreamServer struct {
 	w          wallet.WalletIntf
 	aesKey     [32]byte
 	minerId    account.BeatleAddress
+	protect func(fd int32) bool
+	getTarget func(conn net.Conn) (string,error)
+	removeSession func(conn net.Conn)
 }
 
 type CloseConn struct {
@@ -57,7 +61,7 @@ func (cl *CloseListener) Close() error {
 	return nil
 }
 
-func NewStreamServer(idx int) *StreamServer {
+func NewStreamServer(idx int,protect func(fd int32) bool, getTarget func(conn net.Conn) (string,error), removeSession func(conn net.Conn)) *StreamServer {
 
 	cfg := config.GetCBtlc()
 
@@ -71,7 +75,13 @@ func NewStreamServer(idx int) *StreamServer {
 	m := cfg.Miners[idx]
 	remoteAddr := m.Ipv4Addr + ":" + strconv.Itoa(m.Port)
 
-	ss := &StreamServer{addr: addr, remoteAddr: remoteAddr}
+	ss := &StreamServer{
+		addr: addr,
+		remoteAddr: remoteAddr,
+		protect: protect,
+		getTarget: getTarget,
+		removeSession: removeSession,
+	}
 	ss.quit = make(chan struct{})
 	ss.session = make(map[string]net.Conn)
 	ss.minerId = m.MinerId
@@ -100,17 +110,6 @@ func (ss *StreamServer) StartServer() error {
 	}
 
 	copy(ss.aesKey[:], key)
-	//
-	//nc := net.ListenConfig{Control: func(network, address string, c syscall.RawConn) error {
-	//	var opErr error
-	//	err := c.Control(func(fd uintptr) {
-	//		opErr = unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_REUSEPORT, 1)
-	//	})
-	//	if err != nil {
-	//		return err
-	//	}
-	//	return opErr
-	//}}
 
 	var lis net.Listener
 
@@ -215,24 +214,60 @@ func (ss *StreamServer) RemoteHandShake(conn net.Conn) (net.Conn, error) {
 
 }
 
+func (ss *StreamServer) dialTcpWithSaver(addr string) (net.Conn, error) {
+	d := &net.Dialer{
+		Timeout: time.Second * 2,
+		Control: func(network, address string, c syscall.RawConn) error {
+			if ss.protect != nil {
+				return c.Control(func(fd uintptr) {
+					ss.protect(int32(fd))
+				})
+			}
+			return nil
+		},
+	}
+
+	conn, err := d.Dial("tcp", addr)
+	if err != nil {
+		return nil, err
+	}
+
+	return conn, nil
+}
+
 func (ss *StreamServer) handleConn(conn net.Conn) {
 	defer ss.wg.Done()
-	defer conn.Close()
+	defer func() {
+		if ss.removeSession != nil{
+			ss.removeSession(conn)
+		}
+		conn.Close()
+	}()
+
 
 	conn.(*CloseConn).Conn.(*net.TCPConn).SetKeepAlive(true)
 
 	var (
-		tgt Addr
+		tgts string
 		err error
 		rc  net.Conn
 		rcs net.Conn
 	)
 
-	rc, err = net.Dial("tcp", ss.remoteAddr)
-	if err != nil {
-		log.Println("failed to connect to server ", ss.remoteAddr, err)
-		return
+	if ss.protect == nil{
+		rc, err = net.Dial("tcp", ss.remoteAddr)
+		if err != nil {
+			log.Println("failed to connect to server ", ss.remoteAddr, err)
+			return
+		}
+	}else{
+		rc,err = ss.dialTcpWithSaver(ss.remoteAddr)
+		if err != nil {
+			log.Println("failed to connect to server ", ss.remoteAddr, err)
+			return
+		}
 	}
+
 	defer rc.Close()
 	rc.(*net.TCPConn).SetKeepAlive(true)
 
@@ -242,12 +277,11 @@ func (ss *StreamServer) handleConn(conn net.Conn) {
 		return
 	}
 
-	if tgt, err = Handshake(conn); err != nil {
+	if tgts, err = ss.getTarget(conn); err != nil {
 		return
 	}
 
-	tgts := tgt.String()
-	if _, err = rcs.Write(tgt); err != nil {
+	if _, err = rcs.Write(ParseAddr(tgts)); err != nil {
 		log.Println("failed to send target address: ", err)
 		return
 	}

@@ -111,19 +111,19 @@ func (ctdb *ClientTransactionDb) Save() {
 	ctdb.NbsDbInter.Save()
 }
 
-func (ctdb *ClientTransactionDb) Iterator() {
+func (ctdb *ClientTransactionDb) Iterator() *db.DBCusor {
 	ctdb.dbLock.Lock()
 	defer ctdb.dbLock.Unlock()
 
-	ctdb.cursor = ctdb.NbsDbInter.DBIterator()
+	return  ctdb.NbsDbInter.DBIterator()
 }
 
-func (ctdb *ClientTransactionDb) Next() (txid *common.Hash, ci *ClientTranstionItem, err error) {
-	if ctdb.cursor == nil {
+func (ctdb *ClientTransactionDb) Next(cursor *db.DBCusor) (txid *common.Hash, ci *ClientTranstionItem, err error) {
+	if cursor == nil {
 		return nil, nil, errors.New("initialize cursor first")
 	}
 	ctdb.dbLock.Lock()
-	k, v := ctdb.cursor.Next()
+	k, v := cursor.Next()
 	if k == "" {
 		ctdb.dbLock.Unlock()
 		return nil, nil, errors.New("no transaction in list")
@@ -172,12 +172,12 @@ func (ctdb *ClientTransactionDb) Use(tx *common.Hash) error {
 }
 
 func (ctdb *ClientTransactionDb) FindLatest() (*ClientTranstionItem, error) {
-	ctdb.Iterator()
+	cursor:=ctdb.Iterator()
 
 	var latest *ClientTranstionItem
 
 	for {
-		k, v, err := ctdb.Next()
+		k, v, err := ctdb.Next(cursor)
 		if k == nil || err != nil {
 			break
 		}

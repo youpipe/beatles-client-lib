@@ -54,6 +54,14 @@ func LoadWallet(auth string) error {
 	return nil
 }
 
+func IsWalletCreate() bool  {
+	cfg:=config.GetCBtlc()
+	if !tools.FileExists(cfg.GetWalletSavePath()){
+		return false
+	}
+	return true
+}
+
 func ShowWallet() (string, error) {
 	cfg := config.GetCBtlc()
 	if !tools.FileExists(cfg.GetWalletSavePath()) {

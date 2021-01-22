@@ -3,6 +3,7 @@ package streamserver
 import (
 	"errors"
 	"log"
+	"net"
 	"sync"
 )
 
@@ -14,22 +15,22 @@ var (
 )
 
 func GetStreamServer() *StreamServer {
-	if streamserver == nil {
-		streamserverlock.Lock()
-		defer streamserverlock.Unlock()
-		if streamserver == nil {
-			streamserver = NewStreamServer(0)
-		}
-	}
+	//if streamserver == nil {
+	//	streamserverlock.Lock()
+	//	defer streamserverlock.Unlock()
+	//	if streamserver == nil {
+	//		streamserver = NewStreamServer(0)
+	//	}
+	//}
 	return streamserver
 }
 
-func GetStreamServerWithIdx(idx int) *StreamServer {
+func GetStreamServerWithIdx(idx int,protect func(fd int32) bool, getTarget func(conn net.Conn) (string,error), removeSession func(conn net.Conn)) *StreamServer {
 	if streamserver == nil {
 		streamserverlock.Lock()
 		defer streamserverlock.Unlock()
 		if streamserver == nil {
-			streamserver = NewStreamServer(idx)
+			streamserver = NewStreamServer(idx,protect,getTarget,removeSession)
 		}
 	}
 	return streamserver
@@ -55,7 +56,7 @@ func isStart() bool {
 func StreamServerIsStart() bool {
 	return streamServerFlag
 }
-func StartStreamServer(idx int) error {
+func StartStreamServer(idx int,protect func(fd int32) bool, getTarget func(conn net.Conn) (string,error), removeSession func(conn net.Conn)) error {
 
 	if streamServerFlag || isStart() {
 		return errors.New("vpn have started")
@@ -63,7 +64,7 @@ func StartStreamServer(idx int) error {
 
 	log.Println("begin start vpn...")
 
-	GetStreamServerWithIdx(idx).StartServer()
+	GetStreamServerWithIdx(idx,protect,getTarget,removeSession).StartServer()
 
 	return nil
 }

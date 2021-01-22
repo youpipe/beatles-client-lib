@@ -80,7 +80,6 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		_, err := cmdcommon.IsProcessCanStarted()
 		if err != nil {
-			//log.Println(err)
 			startWebView()
 			return
 		}

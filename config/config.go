@@ -18,6 +18,8 @@ const (
 	BTLC_CFG_FileName = "btlclient.json"
 )
 
+var homeDir string
+
 type ClientPrice struct {
 	Sig          *licenses.NoncePriceSig `json:"sig"`
 	Gas          float64                 `json:"gas"`
@@ -183,12 +185,21 @@ func LoadFromCmd(initfromcmd func(cmdbc *BtlClientConf) *BtlClientConf) *BtlClie
 }
 
 func GetBtlcHomeDir() string {
-	curHome, err := tools.Home()
-	if err != nil {
-		log.Fatal(err)
+
+	if homeDir == ""{
+		curHome, err := tools.Home()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		homeDir = path.Join(curHome, BTLC_HomeDir)
 	}
 
-	return path.Join(curHome, BTLC_HomeDir)
+	return homeDir
+}
+
+func SetHomeDir(basdir string)  {
+	homeDir = basdir
 }
 
 func GetBtlcCFGFile() string {

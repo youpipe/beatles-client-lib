@@ -61,7 +61,6 @@ var daemonCmd = &cobra.Command{
 		}
 		d, err := cntxt.Reborn()
 		if err != nil {
-
 			log.Fatal("Unable to run: ", err)
 		}
 		if d != nil {
@@ -114,7 +113,7 @@ var daemonCmd = &cobra.Command{
 
 		go pacserver.StartWebDaemon()
 
-		go streamserver.StartStreamServer(minerIdx)
+		go streamserver.StartStreamServer(minerIdx,nil,streamserver.Handshake,nil)
 
 		setting.SetProxy(cfg.VPNMode)
 

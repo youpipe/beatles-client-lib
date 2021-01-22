@@ -15,6 +15,10 @@ import (
 
 var webserver *http.Server
 
+func WebDaemonIsStarted() bool  {
+	return webserver != nil
+}
+
 func StartWebDaemon() {
 
 	mux := http.NewServeMux()
@@ -60,6 +64,10 @@ func StartWebDaemon() {
 //}
 
 func StopWebDaemon() {
+	if webserver == nil{
+		return
+	}
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	webserver.Shutdown(ctx)
+	webserver = nil
 }

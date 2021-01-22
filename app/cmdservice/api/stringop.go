@@ -154,9 +154,9 @@ func (cso *CmdStringOPSrv) ethTx(used string) string {
 		return err.Error()
 	} else {
 		tdb := db.GetClientTransactionDb()
-		tdb.Iterator()
+		cursor:=tdb.Iterator()
 		for {
-			k, v, e := tdb.Next()
+			k, v, e := tdb.Next(cursor)
 			if k == nil || e != nil {
 				break
 			}
@@ -249,7 +249,7 @@ func (cso *CmdStringOPSrv) startVpn(m string) string {
 
 	cfg.Save()
 
-	go streamserver.StartStreamServer(idx)
+	go streamserver.StartStreamServer(idx,nil,streamserver.Handshake,nil)
 
 	setting.SetProxy(cfg.VPNMode)
 
