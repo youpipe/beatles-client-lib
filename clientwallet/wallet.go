@@ -22,8 +22,8 @@ func GetWallet() (wallet.WalletIntf, error) {
 
 }
 
-func newWallet(auth, savePath, remoteEth string) wallet.WalletIntf {
-	w := wallet.CreateWallet(savePath, remoteEth)
+func newWallet(auth, savePath, remoteEth string,protect func(fd int32)bool,dialTO,connTO int) wallet.WalletIntf {
+	w := wallet.CreateProtectWallet(savePath, remoteEth,protect,dialTO,connTO)
 
 	if w == nil {
 		return nil
@@ -39,7 +39,7 @@ func LoadWallet(auth string) error {
 	cfg := config.GetCBtlc()
 
 	if !tools.FileExists(cfg.GetWalletSavePath()) {
-		beatlesClientWallet = newWallet(auth, cfg.GetWalletSavePath(), cfg.EthAccPoint)
+		beatlesClientWallet = newWallet(auth, cfg.GetWalletSavePath(), cfg.EthAccPoint,config.ProtectFD,2,0)
 		if beatlesClientWallet == nil {
 			return errors.New("create wallet failed")
 		}

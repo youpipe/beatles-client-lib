@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/giantliao/beatles-protocol/licenses"
 	"github.com/giantliao/beatles-protocol/miners"
 	"github.com/kprc/libeth/account"
@@ -22,6 +23,7 @@ var homeDir string
 
 
 var	ProtectFD  func(fd int32) bool
+var PingTestResult     map[account.BeatleAddress]int64
 
 type ClientPrice struct {
 	Sig          *licenses.NoncePriceSig `json:"sig"`
@@ -53,11 +55,14 @@ type BtlClientConf struct {
 	PurchasePath     string                `json:"purchase_path"`
 	ListMinerPath    string                `json:"list_miner_path"`
 	FreshLicensePath string                `json:"fresh_license_path"`
+	PingPath		 string  			   `json:"ping_path"`
+
 	CurrentMiner     account.BeatleAddress `json:"current_miner"`
 	VPNMode          int                   `json:"vpn_mode"` //1 global, 0 pac
 
 	GithubAddress []*miners.GithubDownLoadPoint `json:"github_address"`
 	Miners        []*miners.Miner               `json:"miners"`
+
 
 
 	EthBalance       float64               `json:"-"`
@@ -86,6 +91,7 @@ func (bc *BtlClientConf) InitCfg() *BtlClientConf {
 	bc.PurchasePath = "purchase"
 	bc.ListMinerPath = "list"
 	bc.FreshLicensePath = "freshlic"
+	bc.PingPath = "ping"
 
 	gd := &miners.GithubDownLoadPoint{}
 	gd.Path = "v2.boostrap"
@@ -267,6 +273,18 @@ func (bc *BtlClientConf) GetListMinerPath(ip string, port int) string {
 	return url
 }
 
+func (bc *BtlClientConf)GetPingPath(ip string, port int) string  {
+	url := "http://" + ip
+	url += ":" + strconv.Itoa(port)
+
+	lmPath := path.Join(bc.ApiPath, bc.PingPath)
+
+	url += "/" + lmPath
+
+	return url
+}
+
+
 func (bc *BtlClientConf) GetFreshLicensePath(ip string, port int) string {
 	url := "http://" + ip
 	url += ":" + strconv.Itoa(port)
@@ -301,4 +319,26 @@ func IsInitialized() bool {
 	}
 
 	return false
+}
+
+func AddPingTestResult(id account.BeatleAddress,ms int64)   {
+	if PingTestResult == nil{
+		PingTestResult = make(map[account.BeatleAddress]int64)
+	}
+
+	PingTestResult[id] = ms
+}
+
+func GetPingTestResult(id account.BeatleAddress) (int64,error) {
+	if PingTestResult == nil{
+		return -1,errors.New("no result in mem")
+	}
+
+	v,ok:=PingTestResult[id]
+	if !ok{
+		return -1,errors.New("no result in mem")
+	}
+
+	return v,nil
+
 }

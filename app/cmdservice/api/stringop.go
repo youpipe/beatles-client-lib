@@ -3,12 +3,14 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/giantliao/beatles-client-lib/app/cmdcommon"
 	"github.com/giantliao/beatles-client-lib/app/cmdpb"
 	"github.com/giantliao/beatles-client-lib/config"
 	"github.com/giantliao/beatles-client-lib/db"
 	"github.com/giantliao/beatles-client-lib/licenses"
+	"github.com/giantliao/beatles-client-lib/ping"
 	"github.com/giantliao/beatles-client-lib/streamserver"
 	"github.com/giantliao/beatles-mac-client/setting"
 	prolic "github.com/giantliao/beatles-protocol/licenses"
@@ -38,6 +40,8 @@ func (cso *CmdStringOPSrv) StringOpDo(cxt context.Context, so *cmdpb.StringOP) (
 		msg = cso.startVpn(so.Param[0])
 	case cmdcommon.CMD_VPN_MODE:
 		msg = cso.setMode(so.Param[0])
+	case cmdcommon.CMD_PING:
+		msg = cso.pingminer(so.Param[0])
 	default:
 		return encapResp("Command Not Found"), nil
 	}
@@ -287,6 +291,57 @@ func (cso *CmdStringOPSrv) setMode(v string) string {
 	//log.Print("time:",tools.GetNowMsTime() - now)
 	return "set mode success"
 }
+
+func (cso *CmdStringOPSrv)pingminer(minerid string) string  {
+	if minerid != ""{
+		if !account.IsValidID(minerid){
+			return "miner id not correct"
+		}
+		cfg:=config.GetCBtlc()
+
+		idx:=-1
+
+		for i:=0;i<len(cfg.Miners);i++{
+			if cfg.Miners[i].MinerId == account.BeatleAddress(minerid){
+				idx = i
+				break
+			}
+		}
+
+		if idx < 0{
+			return "miner not found"
+		}
+
+		tv,err:=ping.Ping(cfg.Miners[idx].Ipv4Addr,cfg.Miners[idx].Port)
+		if err!=nil{
+			return "ping failed"
+		}
+
+		config.AddPingTestResult(account.BeatleAddress(minerid),tv)
+
+		return "time delay:"+strconv.FormatInt(tv,10)
+	}else{
+		cfg:=config.GetCBtlc()
+		for i:=0;i<len(cfg.Miners);i++{
+			tv,err:=ping.Ping(cfg.Miners[i].Ipv4Addr,cfg.Miners[i].Port)
+			if err!=nil{
+				continue
+			}
+			config.AddPingTestResult(cfg.Miners[i].MinerId,tv)
+		}
+
+		msg:=""
+
+		for k,v:=range config.PingTestResult{
+			msg += fmt.Sprintf("%s: %d",k,v)
+		}
+		if msg == ""{
+			return "ping failed"
+		}
+		return msg
+	}
+}
+
 
 func int64time2string(t int64) string {
 	tm := time.Unix(t/1000, 0)

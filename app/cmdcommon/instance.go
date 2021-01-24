@@ -21,4 +21,5 @@ const (
 	CMD_SHOW_ETH_TX       int32 = 5
 	CMD_SHOW_LICENSE      int32 = 6
 	CMD_START_VPN         int32 = 7
+	CMD_PING			  int32 = 8
 )
