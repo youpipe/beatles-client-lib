@@ -26,7 +26,7 @@ import (
 	"github.com/howeyc/gopass"
 	"github.com/sevlyar/go-daemon"
 	"github.com/spf13/cobra"
-	"github.com/webview/webview"
+	//"github.com/webview/webview"
 	"log"
 	"os"
 	"path"
@@ -63,13 +63,13 @@ func inputChoose() (choose string, err error) {
 }
 
 func startWebView() {
-	debug := false
-	w := webview.New(debug)
-	defer w.Destroy()
-	w.SetTitle("beatles client")
-	w.SetSize(860, 768, webview.HintFixed)
-	w.Navigate("http://127.0.0.1:50211/web/")
-	w.Run()
+	//debug := false
+	//w := webview.New(debug)
+	//defer w.Destroy()
+	//w.SetTitle("beatles client")
+	//w.SetSize(860, 768, webview.HintFixed)
+	//w.Navigate("http://127.0.0.1:50211/web/")
+	//w.Run()
 }
 
 // rootCmd represents the base command when called without any subcommands

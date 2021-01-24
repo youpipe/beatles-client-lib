@@ -20,6 +20,9 @@ const (
 
 var homeDir string
 
+
+var	ProtectFD  func(fd int32) bool
+
 type ClientPrice struct {
 	Sig          *licenses.NoncePriceSig `json:"sig"`
 	Gas          float64                 `json:"gas"`
@@ -50,15 +53,17 @@ type BtlClientConf struct {
 	PurchasePath     string                `json:"purchase_path"`
 	ListMinerPath    string                `json:"list_miner_path"`
 	FreshLicensePath string                `json:"fresh_license_path"`
-	EthBalance       float64               `json:"-"`
-	TrxBalance       float64               `json:"-"`
-	MemLicense       *licenses.License     `json:"-"`
-	MemPrice         *ClientPrice          `json:"-"`
 	CurrentMiner     account.BeatleAddress `json:"current_miner"`
 	VPNMode          int                   `json:"vpn_mode"` //1 global, 0 pac
 
 	GithubAddress []*miners.GithubDownLoadPoint `json:"github_address"`
 	Miners        []*miners.Miner               `json:"miners"`
+
+
+	EthBalance       float64               `json:"-"`
+	TrxBalance       float64               `json:"-"`
+	MemLicense       *licenses.License     `json:"-"`
+	MemPrice         *ClientPrice          `json:"-"`
 }
 
 var (

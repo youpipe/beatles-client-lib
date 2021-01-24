@@ -111,8 +111,8 @@ func (clr *ClientLicenseRenew) GetLicense() *licenses.License {
 	flag := false
 	for i := 0; i < len(cfg.Miners); i++ {
 		url := cfg.GetPurchasePath(cfg.Miners[i].Ipv4Addr, cfg.Miners[i].Port-1)
-
-		resp, code, err = httputil.Post(url, m.ContentS, true)
+		hp:=&httputil.HttpPost{Protect: config.ProtectFD,Blog: true,DialTimeout: 2,ConnTimeout: 2}
+		resp, code, err = hp.ProtectPost(url, m.ContentS)
 		if err != nil || code != 200 || resp == "" {
 			continue
 		} else {

@@ -110,7 +110,8 @@ func (cp *CurrentPrice) Get() *config.ClientPrice {
 	//todo... post to random miner
 	for i := 0; i < len(cp.miners); i++ {
 		url := cfg.GetNoncePriceWebPath(cp.miners[i].Ipv4Addr, cp.miners[i].Port-1)
-		resp, code, err = httputil.Post(url, m.ContentS, true)
+		hp:=&httputil.HttpPost{Protect: config.ProtectFD,Blog: true,DialTimeout: 2,ConnTimeout: 2}
+		resp, code, err = hp.ProtectPost(url, m.ContentS)
 		if err != nil || code != 200 || resp == "" {
 			continue
 		} else {
