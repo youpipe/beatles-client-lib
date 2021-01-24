@@ -15,6 +15,7 @@ import (
 	"github.com/giantliao/beatles-mac-client/setting"
 	prolic "github.com/giantliao/beatles-protocol/licenses"
 	"github.com/kprc/libeth/account"
+	log "github.com/sirupsen/logrus"
 	"strconv"
 
 	"time"
@@ -314,6 +315,7 @@ func (cso *CmdStringOPSrv)pingminer(minerid string) string  {
 
 		tv,err:=ping.Ping(cfg.Miners[idx].Ipv4Addr,cfg.Miners[idx].Port)
 		if err!=nil{
+			log.Println("=====>",err.Error())
 			return "ping failed"
 		}
 
@@ -333,6 +335,9 @@ func (cso *CmdStringOPSrv)pingminer(minerid string) string  {
 		msg:=""
 
 		for k,v:=range config.PingTestResult{
+			if msg !=""{
+				msg +="\r\n"
+			}
 			msg += fmt.Sprintf("%s: %d",k,v)
 		}
 		if msg == ""{

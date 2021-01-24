@@ -8,6 +8,7 @@ import (
 	"github.com/giantliao/beatles-protocol/meta"
 	"github.com/kprc/nbsnetwork/tools"
 	"github.com/kprc/nbsnetwork/tools/httputil"
+	"log"
 )
 
 func Ping(ip string,port int) (int64,error) {
@@ -17,8 +18,6 @@ func Ping(ip string,port int) (int64,error) {
 	}
 
 	cfg := config.GetCBtlc()
-
-
 
 	buf:=make([]byte,32)
 	_,err = rand.Read(buf)
@@ -30,7 +29,7 @@ func Ping(ip string,port int) (int64,error) {
 
 	m.Marshal(w.BtlAddress().String(), buf)
 
-	url:=cfg.GetPingPath(ip,port)
+	url:=cfg.GetPingPath(ip,port-1)
 
 	hp:=&httputil.HttpPost{Protect: config.ProtectFD,Blog: true,DialTimeout: 2,ConnTimeout: 2}
 
@@ -41,6 +40,11 @@ func Ping(ip string,port int) (int64,error) {
 	)
 	resp, code, err = hp.ProtectPost(url, m.ContentS)
 	if err != nil || code != 200 || resp == "" {
+
+		if err!=nil{
+			log.Println("--------->",err.Error())
+		}
+
 		return 0,errors.New("post failed")
 	}
 
