@@ -70,8 +70,25 @@ func UpdateBootstrap() error {
 	//update bootstrap
 	cfg.GithubAddress = btms.NextDownloadPoint
 
+	var boots []*miners.Miner
 	//update miners
-	cfg.Miners = btms.Boots
+	for i:=0;i<len(btms.Boots);i++{
+		flag:=false
+		for j:=0;j<len(cfg.Miners);j++{
+			if btms.Boots[i].MinerId == cfg.Miners[j].MinerId{
+				cfg.Miners[j] = btms.Boots[i]
+				flag = true
+				break
+			}
+		}
+		if !flag{
+			boots = append(boots,btms.Boots[i])
+		}
+	}
+
+	for i:=0;i<len(boots);i++{
+		cfg.Miners = append(cfg.Miners,boots[i])
+	}
 
 	return nil
 }

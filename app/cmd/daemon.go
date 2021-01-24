@@ -78,14 +78,14 @@ var daemonCmd = &cobra.Command{
 
 		passwd := processChan.ReceivePasswd(daemondir)
 
-		if len(cfg.Miners) == 0 {
-			err := bootstrap.UpdateBootstrap()
-			if err != nil {
-				log.Println(err.Error())
-				return
-			}
 
+		err = bootstrap.UpdateBootstrap()
+		if err != nil {
+			log.Println(err.Error())
+			return
 		}
+
+
 
 		if len(cfg.Miners) == 0 {
 			panic("no miner to start vpn")
