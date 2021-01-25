@@ -90,5 +90,7 @@ func UpdateBootstrap() error {
 		cfg.Miners = append(cfg.Miners,boots[i])
 	}
 
+	cfg.Save()
+
 	return nil
 }
