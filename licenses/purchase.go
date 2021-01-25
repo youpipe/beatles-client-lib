@@ -1,6 +1,7 @@
 package licenses
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/giantliao/beatles-client-lib/clientwallet"
@@ -24,6 +25,11 @@ type ClientLicenseRenew struct {
 
 func NewClientLicenseRenew(price *config.ClientPrice, name, email, cell string) *ClientLicenseRenew {
 	return &ClientLicenseRenew{price: price, Name: name, Cell: cell, Email: email}
+}
+
+func (clr *ClientLicenseRenew)String() string  {
+	j,_:=json.MarshalIndent(*clr," ","\t")
+	return string(j)
 }
 
 func (clr *ClientLicenseRenew) Buy() error {

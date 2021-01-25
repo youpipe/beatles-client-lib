@@ -108,6 +108,8 @@ func (cso *CmdStringOPSrv) ethBuy(name, email, cell string) string {
 		return err.Error()
 	}
 
+	log.Println(lr.String())
+
 	tdb := db.GetClientTransactionDb()
 	if v := tdb.Find(*lr.Transaction); v != nil {
 		return v.String()
