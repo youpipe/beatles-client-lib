@@ -23,13 +23,12 @@ func StartWebDaemon() {
 
 	mux := http.NewServeMux()
 
-	wfs := assetfs.AssetFS{Asset: webfs.Asset, AssetDir: webfs.AssetDir, AssetInfo: webfs.AssetInfo, Prefix: "resource/localweb"}
-
-	mux.Handle("/web/", http.StripPrefix("/web/", http.FileServer(&wfs)))
-
 	fs := assetfs.AssetFS{Asset: paclist.Asset, AssetDir: paclist.AssetDir, AssetInfo: paclist.AssetInfo, Prefix: "resource/script"}
 
-	mux.Handle("/", http.FileServer(&fs))
+	mux.Handle("/web/", http.StripPrefix("/web/", http.FileServer(&fs)))
+
+	wfs := assetfs.AssetFS{Asset: webfs.Asset, AssetDir: webfs.AssetDir, AssetInfo: webfs.AssetInfo, Prefix: "resource/localweb"}
+	mux.Handle("/", http.FileServer(&wfs))
 
 	addr := ":" + strconv.Itoa(config.GetCBtlc().StreamServerPacPort)
 
