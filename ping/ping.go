@@ -40,7 +40,6 @@ func Ping(ip string,port int) (int64,error) {
 	)
 	resp, code, err = hp.ProtectPost(url, m.ContentS)
 	if err != nil || code != 200 || resp == "" {
-
 		if err!=nil{
 			log.Println("--------->",err.Error())
 		}
@@ -50,7 +49,7 @@ func Ping(ip string,port int) (int64,error) {
 
 	time2:=tools.GetNowMsTime()
 
-	return time2-time1,nil
+	return (time2-time1)/3,nil
 
 }
 
