@@ -178,6 +178,12 @@ func buyLicenseResult(bl *BeetleBuyLicense) (*db.ClientTranstionItem, error) {
 	}
 }
 
+
+type BeetleLicenseLog struct {
+	TxStr string  			`json:"tx_str"`
+	*db.ClientTranstionItem
+}
+
 func buyLicense(w http.ResponseWriter , r *http.Request)  {
 	pbytes,err:=ReadReq(r)
 	if err!=nil{
@@ -206,10 +212,15 @@ func buyLicense(w http.ResponseWriter , r *http.Request)  {
 	if err!=nil{
 		w.WriteHeader(200)
 		w.Write([]byte(SimpleResponse(1,err.Error(),3)))
+		return
 	}
 
+	bll:=&BeetleLicenseLog{}
+	bll.TxStr = item.Tx.String()
+	bll.ClientTranstionItem = item
+
 	w.WriteHeader(200)
-	w.Write([]byte(Respponse(0,"",0,item)))
+	w.Write([]byte(Respponse(0,"",0,bll)))
 
 }
 
@@ -298,10 +309,6 @@ func refrehLicense(w http.ResponseWriter , r *http.Request)  {
 
 }
 
-type BeetleLicenseLog struct {
-	TxStr string  			`json:"tx_str"`
-	*db.ClientTranstionItem
-}
 
 type BeetleNewLicenseLog struct {
 	Logs []*BeetleLicenseLog	`json:"logs"`
