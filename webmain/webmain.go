@@ -140,8 +140,7 @@ func StartWEBService(proxy Proxy)  {
 		syscall.SIGKILL,
 		syscall.SIGINT,
 		syscall.SIGTERM,
-		syscall.SIGQUIT,
-		syscall.SIGUSR1)
+		syscall.SIGQUIT)
 
 	s:=<-stop
 
@@ -156,7 +155,7 @@ var flag = false
 var stopflagLock sync.Mutex
 
 func sig2Beetle()  {
-	stop <- syscall.SIGUSR1
+	stop <- syscall.SIGQUIT
 }
 
 func StopAll()  {
