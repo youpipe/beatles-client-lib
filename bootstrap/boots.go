@@ -7,7 +7,9 @@ import (
 	"github.com/giantliao/beatles-protocol/miners"
 	"github.com/giantliao/beatles-protocol/token"
 	"github.com/kprc/libgithub"
+	"github.com/kprc/nbsnetwork/tools"
 	"log"
+	"time"
 )
 
 func DownloadBootstrap() (content string, err error) {
@@ -90,7 +92,39 @@ func UpdateBootstrap() error {
 		cfg.Miners = append(cfg.Miners,boots[i])
 	}
 
+	cfg.LastDownBootsTime = tools.GetNowMsTime()
+
+
 	cfg.Save()
 
 	return nil
 }
+
+var stopBoostrapDownload chan struct{}
+
+var downloadInterval int64 = 24*60*60*1000 //24 hours
+
+func StartTimer()  {
+	stopBoostrapDownload = make(chan struct{},8)
+
+	tic:=time.NewTicker(time.Second*300)  //5 minutes
+	defer tic.Stop()
+
+	for  {
+		select {
+		case <-tic.C:
+			cfg:=config.GetCBtlc()
+			if tools.GetNowMsTime() - cfg.LastDownBootsTime > downloadInterval{
+				UpdateBootstrap()
+			}
+		case <-stopBoostrapDownload:
+			return
+		}
+	}
+
+}
+
+func StopTimer()  {
+	close(stopBoostrapDownload)
+}
+

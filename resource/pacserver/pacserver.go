@@ -19,7 +19,7 @@ func WebDaemonIsStarted() bool  {
 	return webserver != nil
 }
 
-func StartWebDaemon() {
+func StartWebDaemon(addApi ...func(mux *http.ServeMux)) {
 
 	mux := http.NewServeMux()
 
@@ -28,7 +28,12 @@ func StartWebDaemon() {
 	mux.Handle("/web/", http.StripPrefix("/web/", http.FileServer(&fs)))
 
 	wfs := assetfs.AssetFS{Asset: webfs.Asset, AssetDir: webfs.AssetDir, AssetInfo: webfs.AssetInfo, Prefix: "resource/localweb"}
+
 	mux.Handle("/", http.FileServer(&wfs))
+
+	for _,add:=range addApi{
+		add(mux)
+	}
 
 	addr := ":" + strconv.Itoa(config.GetCBtlc().StreamServerPacPort)
 

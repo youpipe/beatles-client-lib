@@ -63,6 +63,7 @@ type BtlClientConf struct {
 	GithubAddress []*miners.GithubDownLoadPoint `json:"github_address"`
 	Miners        []*miners.Miner               `json:"miners"`
 
+	LastDownBootsTime int64 				`json:"last_down_boots_time"`
 
 
 	EthBalance       float64               `json:"-"`
@@ -340,5 +341,8 @@ func GetPingTestResult(id account.BeatleAddress) (int64,error) {
 	}
 
 	return v,nil
+}
 
+func (bc *BtlClientConf)GetVPNPage() string {
+	return "http://127.0.0.1:"+strconv.Itoa(bc.StreamServerPacPort)
 }
