@@ -25,7 +25,7 @@ func walletIsCreate(w http.ResponseWriter, r *http.Request)  {
 
 	status  := 0
 
-	if b{
+	if !b{
 		status = 1
 	}
 
@@ -40,10 +40,10 @@ func walletIsOpen(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 
-	status := 0
+	status := 1
 
 	if _,err:=clientwallet.GetWallet();err==nil{
-		status = 1
+		status = 0
 	}
 
 	w.WriteHeader(200)

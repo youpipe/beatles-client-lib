@@ -144,7 +144,7 @@ func StartWEBService(proxy Proxy)  {
 
 	s:=<-stop
 
-	fmt.Println("get signal:",s)
+	//fmt.Println("get signal:",s)
 	log.Println("get signal:",s)
 
 	StopAll()

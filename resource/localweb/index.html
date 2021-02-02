@@ -12,7 +12,26 @@
     </style>
     <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
     
+    <script type="text/javascript">
+        function redict(){
+            $.ajax({
+                url: '/api/wallet/isOpen',
+                dataType:"json",
+                method: 'GET',
+            }).done(function(result){
+                console.log(result);
+                if (result.status == 1){
+                    window.location.replace("http://127.0.0.1:50211/login.html");
+                }
+            }).fail(function(jqXHR, textStatus){
+                console.log(textStatus);
+            });
+        }
+        redict()
 
+        
+
+    </script>
 
 
 </head>
