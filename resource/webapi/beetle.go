@@ -10,20 +10,21 @@ import (
 	"github.com/giantliao/beatles-client-lib/miners"
 	"github.com/giantliao/beatles-client-lib/ping"
 	"github.com/giantliao/beatles-client-lib/streamserver"
-	"github.com/giantliao/beatles-mac-client/setting"
 	prominers "github.com/giantliao/beatles-protocol/miners"
 	"github.com/kprc/libeth/account"
 	"github.com/kprc/nbsnetwork/tools"
-	"time"
 	"log"
 	"net/http"
+	"time"
 )
 
 var beetleSetMode func(mode int)
 var beetleGetMode func() int
+var clearProxy func()
 var stopBeetle func()
 
-func BeetleInject(setmode func(mode int), getmode func() int,stopbeetle func())  {
+func BeetleInject(clear func(),setmode func(mode int), getmode func() int,stopbeetle func())  {
+	clearProxy = clear
 	beetleSetMode = setmode
 	beetleGetMode = getmode
 	stopBeetle = stopbeetle
@@ -156,7 +157,7 @@ func beetleStartVpn(w http.ResponseWriter , r *http.Request)  {
 
 	go streamserver.StartStreamServer(minerIdx,nil,streamserver.Handshake,nil)
 
-	setting.SetProxy(cfg.VPNMode)
+	beetleSetMode(cfg.VPNMode)
 
 	cfg.Save()
 
@@ -183,7 +184,7 @@ func beetleStopVpn(w http.ResponseWriter , r *http.Request)  {
 	streamserver.StopStreamserver()
 	//pacserver.StopWebDaemon()
 
-	setting.ClearProxy()
+	clearProxy()
 
 	w.WriteHeader(200)
 	w.Write([]byte(SimpleResponse(0,"",0)))

@@ -62,6 +62,11 @@ func setMode(mode int)  {
 
 }
 
+func clearProxy()  {
+	currentPorxy.ClearProxy()
+}
+
+
 func getMode() int  {
 	cfg:=config.GetCBtlc()
 	return cfg.VPNMode
@@ -122,7 +127,7 @@ func StartWEBService(proxy Proxy)  {
 		webapi.AddLicenseApi,
 		webapi.AddWalletApi)
 
-	webapi.BeetleInject(setMode,getMode,sig2Beetle)
+	webapi.BeetleInject(clearProxy,setMode,getMode,sig2Beetle)
 
 	OpenBrowser(cfg.GetVPNPage())
 
